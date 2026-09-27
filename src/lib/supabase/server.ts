@@ -7,6 +7,9 @@ import { serverEnv } from "@/lib/env";
 export async function createClient() {
   const cookieStore = await cookies();
   const env = serverEnv();
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    throw new Error("Supabase não configurado — preencha .env.local ou use DEV_AUTH_BYPASS");
+  }
 
   return createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {

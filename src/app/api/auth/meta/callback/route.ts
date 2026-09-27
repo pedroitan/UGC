@@ -23,7 +23,12 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const env = serverEnv();
 
-  if (!env.META_APP_ID || !env.META_APP_SECRET || !env.META_REDIRECT_URI) {
+  if (
+    !env.META_APP_ID ||
+    !env.META_APP_SECRET ||
+    !env.META_REDIRECT_URI ||
+    !env.TOKEN_ENCRYPTION_KEY
+  ) {
     return redirectToSettings(request, "error=meta_not_configured");
   }
 

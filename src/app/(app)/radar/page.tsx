@@ -1,10 +1,18 @@
-import { m } from "@/lib/messages";
+import { redirect } from "next/navigation";
+import { getOrCreateWorkspace, listKeywords, listPautas, listSources } from "@/lib/db";
+import { RadarClient } from "./radar-client";
 
-export default function RadarPage() {
-  return (
-    <div className="flex flex-col gap-1.5 px-11 py-9">
-      <h1 className="font-heading text-[40px] font-semibold tracking-tight">{m.nav.radar}</h1>
-      <p className="text-sm text-muted-foreground">{m.placeholders.radar}</p>
-    </div>
-  );
+export const dynamic = "force-dynamic";
+
+export default async function RadarPage() {
+  const workspace = await getOrCreateWorkspace();
+  if (!workspace) redirect("/login");
+
+  const [keywords, sources, pautas] = await Promise.all([
+    listKeywords(workspace.id),
+    listSources(workspace.id),
+    listPautas(workspace.id, "new"),
+  ]);
+
+  return <RadarClient keywords={keywords} sources={sources} pautas={pautas} />;
 }

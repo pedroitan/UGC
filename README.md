@@ -29,6 +29,12 @@ no `.env.local`.
 
 Gere `TOKEN_ENCRYPTION_KEY` com `openssl rand -base64 32` e um `CRON_SECRET` aleatório.
 
+### Só quer ver as telas, sem Supabase?
+
+No `.env.local`, defina `DEV_AUTH_BYPASS=true` e rode `pnpm dev`. O app entra
+direto como um admin fictício com dados de exemplo (um aviso "Modo dev" aparece
+no topo e nada é persistido). Só funciona em desenvolvimento.
+
 ## Scripts
 
 | Comando | O que faz |

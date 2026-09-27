@@ -4,6 +4,14 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  // Modo dev local: navega sem Supabase. Nunca ativa em produção.
+  if (
+    process.env.DEV_AUTH_BYPASS === "true" &&
+    process.env.NODE_ENV !== "production"
+  ) {
+    return response;
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

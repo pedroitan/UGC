@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 import { LoginForm } from "./login-form";
 import { getCurrentUser } from "@/lib/db";
+import { isDevBypass } from "@/lib/dev-auth";
 import { m } from "@/lib/messages";
 
 export default async function LoginPage() {
+  if (isDevBypass()) redirect("/");
   const user = await getCurrentUser();
   if (user) redirect("/");
 

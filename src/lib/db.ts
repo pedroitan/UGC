@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { DEV_USER, DEV_WORKSPACE, isDevBypass } from "@/lib/dev-auth";
 import { createClient } from "@/lib/supabase/server";
 import type { BrandKitRow, SocialAccountRow, WorkspaceRow } from "@/types/db";
 
@@ -16,10 +17,12 @@ async function currentUser(): Promise<User | null> {
 }
 
 export async function getCurrentUser(): Promise<User | null> {
+  if (isDevBypass()) return DEV_USER;
   return currentUser();
 }
 
 export async function getOrCreateWorkspace(): Promise<WorkspaceRow | null> {
+  if (isDevBypass()) return DEV_WORKSPACE;
   const user = await currentUser();
   if (!user) return null;
   const supabase = await createClient();
@@ -45,6 +48,7 @@ export async function getOrCreateWorkspace(): Promise<WorkspaceRow | null> {
 }
 
 export async function getBrandKit(workspaceId: string): Promise<BrandKitRow | null> {
+  if (isDevBypass()) return null;
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("brand_kits")
@@ -59,6 +63,16 @@ export async function upsertBrandKit(
   workspaceId: string,
   values: Omit<BrandKitRow, "id" | "workspace_id" | "created_at" | "updated_at">,
 ): Promise<BrandKitRow> {
+  if (isDevBypass()) {
+    // Sem banco no modo dev: valida e devolve o payload sem persistir.
+    return {
+      id: "dev",
+      workspace_id: workspaceId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      ...values,
+    };
+  }
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("brand_kits")
@@ -70,6 +84,7 @@ export async function upsertBrandKit(
 }
 
 export async function listSocialAccounts(workspaceId: string): Promise<SocialAccountRow[]> {
+  if (isDevBypass()) return [];
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("social_accounts")

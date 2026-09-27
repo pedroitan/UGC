@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Pauta — Estúdio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F3EE}
+a{color:#17150F}a:hover{color:#9E3113}
+nav a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #F6F3EE; color: #17150F; font-family: Manrope, sans-serif; overflow: hidden">
+<nav aria-label="Principal" style="width: 232px; flex-shrink: 0; box-sizing: border-box; padding: 28px 18px; background: #17150F; color: #F6F3EE; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 28px">
+<div style="width: 34px; height: 34px; border-radius: 9px; background: #E4572E; display: flex; align-items: center; justify-content: center; font-family: Fraunces, serif; font-weight: 700; font-size: 20px; color: #17150F">P</div>
+<span style="font-family: Fraunces, serif; font-size: 26px; font-weight: 600">Pauta</span>
+</div>
+<a href="Main.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; color: #C9C2B4">Dashboard</a>
+<a href="Radar.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; color: #C9C2B4">Radar de pautas</a>
+<a href="Estudio.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 600; color: #FFFFFF; background: #2E2A22">Estúdio</a>
+<a href="Calendario.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; color: #C9C2B4">Calendário</a>
+<a href="BrandKit.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; color: #C9C2B4">Brand Kit</a>
+<div style="margin-top: auto; padding: 14px 12px; border-radius: 10px; background: #2E2A22; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; color: #C9C2B4">Marca ativa</span>
+<span style="font-size: 15px; font-weight: 600">[SUA MARCA]</span>
+<span style="font-size: 13px; color: #C9C2B4">@suamarca · Instagram</span>
+</div>
+</nav>
+<main style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+<header style="height: 76px; flex-shrink: 0; box-sizing: border-box; padding: 0 28px; border-bottom: 1px solid #E4DED3; background: #FFFFFF; display: flex; align-items: center; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex-grow: 1">
+<span style="font-size: 13px; color: #5E584C"><a href="Radar.dc.html" style="color: #5E584C">Radar</a> › Pauta score 94</span>
+<span style="font-size: 17px; font-weight: 700">Festival de verão em Salvador divulga programação completa</span>
+</div>
+<div role="tablist" aria-label="Formato" style="display: flex; padding: 4px; gap: 2px; border-radius: 10px; background: #F3EFE8">
+<button type="button" role="tab" aria-selected="{{isCarousel}}" onClick="{{toCarousel}}" style="padding: 8px 14px; border: none; border-radius: 8px; background: {{tabCarousel}}; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; color: #17150F">Carrossel</button>
+<button type="button" role="tab" aria-selected="{{isStory}}" onClick="{{toStory}}" style="padding: 8px 14px; border: none; border-radius: 8px; background: {{tabStory}}; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; color: #17150F">Story</button>
+<button type="button" role="tab" aria-selected="false" style="padding: 8px 14px; border: none; border-radius: 8px; background: transparent; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; color: #5E584C">Feed</button>
+<button type="button" role="tab" aria-selected="false" style="padding: 8px 14px; border: none; border-radius: 8px; background: transparent; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; color: #5E584C">Reel</button>
+</div>
+<button type="button" style="height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid #D8D1C4; background: #FFFFFF; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; color: #17150F">Descartar</button>
+<a href="Calendario.dc.html" style="height: 42px; padding: 0 18px; border-radius: 10px; background: #17150F; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none; display: flex; align-items: center">Aprovar e agendar</a>
+</header>
+<div style="flex-grow: 1; min-height: 0; display: flex">
+<aside aria-label="Slides" style="width: 148px; flex-shrink: 0; box-sizing: border-box; padding: 20px 18px; border-right: 1px solid #E4DED3; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+<span style="font-size: 13px; font-weight: 700; color: #5E584C">7 slides</span>
+<sc-for list="{{slides}}" as="s" hint-placeholder-count="7">
+<button type="button" onClick="{{s.pick}}" aria-label="Slide {{s.n}}" style="width: 104px; height: 130px; flex-shrink: 0; box-sizing: border-box; padding: 10px; border-radius: 8px; border: {{s.ring}}; background: #17150F; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left">
+<span style="font-family: Fraunces, serif; font-size: 16px; font-weight: 700; color: #E4572E">{{s.num}}</span>
+<span style="font-size: 10px; line-height: 1.25; font-weight: 600; color: #FFFFFF">{{s.title}}</span>
+</button>
+</sc-for>
+</aside>
+<section aria-label="Pré-visualização" style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #EFEAE1">
+<div style="width: 340px; height: 690px; box-sizing: border-box; border-radius: 44px; background: #0E0D0A; padding: 12px">
+<div style="width: 316px; height: 666px; border-radius: 34px; background: #FFFFFF; overflow: hidden; display: flex; flex-direction: column">
+<div style="height: 52px; flex-shrink: 0; padding: 0 14px; display: flex; align-items: center; gap: 10px">
+<div style="width: 30px; height: 30px; border-radius: 15px; background: #E4572E"></div>
+<span style="font-size: 13px; font-weight: 700">suamarca</span>
+</div>
+<sc-if value="{{isCarousel}}" hint-placeholder-val="{{true}}">
+<div style="width: 316px; height: 395px; flex-shrink: 0; box-sizing: border-box; padding: 26px 24px; background: #17150F; color: #FFFFFF; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #F08A66"><span>MÚSICA · SALVADOR</span><span style="color: #C9C2B4">{{current.n}}/7</span></div>
+<span style="font-family: Fraunces, serif; font-size: 44px; font-weight: 700; color: #E4572E; line-height: 1">{{current.num}}</span>
+<span style="font-family: Fraunces, serif; font-size: 27px; font-weight: 600; line-height: 1.1">{{current.title}}</span>
+<span style="font-size: 14px; line-height: 1.45; color: #E4DED3">{{current.body}}</span>
+<div style="margin-top: auto; display: flex; justify-content: space-between; font-size: 11px; color: #C9C2B4"><span>@suamarca</span><span>Arraste →</span></div>
+</div>
+<div style="padding: 12px 14px 0; display: flex; justify-content: center; gap: 4px">
+<sc-for list="{{slides}}" as="d" hint-placeholder-count="7"><div style="width: 6px; height: 6px; border-radius: 3px; background: {{d.dot}}"></div></sc-for>
+</div>
+<div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; line-height: 1.45">
+<span style="font-weight: 700">1.234 curtidas</span>
+<span><b>suamarca</b> A programação do festival de verão saiu. Salve este post para não perder as datas. Fonte: [VEÍCULO ORIGINAL]</span>
+<span style="color: #5E584C">#salvador #festival #musica #agendacultural</span>
+</div>
+</sc-if>
+<sc-if value="{{isStory}}" hint-placeholder-val="{{false}}">
+<div style="flex-grow: 1; box-sizing: border-box; padding: 36px 26px; background: #E4572E; color: #17150F; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; gap: 4px"><div style="flex-grow: 1; height: 3px; border-radius: 2px; background: #17150F"></div><div style="flex-grow: 1; height: 3px; border-radius: 2px; background: rgba(23,21,15,0.3)"></div><div style="flex-grow: 1; height: 3px; border-radius: 2px; background: rgba(23,21,15,0.3)"></div></div>
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em">SAIU A PROGRAMAÇÃO</span>
+<span style="font-family: Fraunces, serif; font-size: 38px; font-weight: 700; line-height: 1.05">Festival de verão: veja quem toca e quando</span>
+<span style="margin-top: auto; padding: 12px 14px; border-radius: 12px; background: #17150F; color: #FFFFFF; font-size: 14px; font-weight: 700; text-align: center">Programação completa: link na bio</span>
+</div>
+</sc-if>
+</div>
+</div>
+<span style="font-size: 13px; color: #5E584C">Pré-visualização em 1080 × 1350 (4:5) · Instagram</span>
+</section>
+<aside aria-label="Edição" style="width: 392px; flex-shrink: 0; box-sizing: border-box; padding: 22px 24px; border-left: 1px solid #E4DED3; background: #FFFFFF; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<h2 style="margin: 0; font-family: Fraunces, serif; font-size: 20px; font-weight: 600">Slide {{current.n}} de 7</h2>
+<span style="padding: 3px 9px; border-radius: 6px; background: #F5EBCF; color: #6B4E0C; font-size: 12px; font-weight: 700">Em revisão</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="titulo" style="font-size: 13px; font-weight: 700">Título</label>
+<input id="titulo" value="{{current.title}}" style="height: 42px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #D8D1C4; font-family: Manrope, sans-serif; font-size: 15px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="texto" style="font-size: 13px; font-weight: 700">Texto</label>
+<textarea id="texto" rows="3" style="box-sizing: border-box; padding: 10px 12px; border-radius: 8px; border: 1px solid #D8D1C4; font-family: Manrope, sans-serif; font-size: 14px; line-height: 1.45; resize: none">{{current.body}}</textarea>
+</div>
+<div style="padding: 12px 14px; border-radius: 10px; background: #F3EFE8; display: flex; flex-direction: column; gap: 4px; font-size: 13px; line-height: 1.4">
+<span style="font-weight: 700">Checagem de fatos</span>
+<span style="color: #3D382F">Datas e local vêm de 3 fontes. Similaridade com o texto original: 12% (limite 30%).</span>
+<a href="#fontes" style="font-weight: 600">Ver trechos nas fontes</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700">Template</span>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<button type="button" aria-label="Template Manchete escura" style="height: 64px; border-radius: 8px; border: 2px solid #E4572E; background: #17150F"></button>
+<button type="button" aria-label="Template Papel" style="height: 64px; border-radius: 8px; border: 1px solid #D8D1C4; background: #F6F3EE"></button>
+<button type="button" aria-label="Template Destaque" style="height: 64px; border-radius: 8px; border: 1px solid #D8D1C4; background: #E4572E"></button>
+<button type="button" aria-label="Template Foto" style="height: 64px; border-radius: 8px; border: 1px solid #D8D1C4; background: #5E584C"></button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="ajuste" style="font-size: 13px; font-weight: 700">Pedir ajuste à IA</label>
+<div style="display: flex; gap: 8px">
+<input id="ajuste" placeholder="Ex.: deixe o gancho mais curto" style="flex-grow: 1; height: 42px; box-sizing: border-box; padding: 0 12px; border-radius: 8px; border: 1px solid #D8D1C4; font-family: Manrope, sans-serif; font-size: 14px">
+<button type="button" style="height: 42px; padding: 0 14px; border-radius: 8px; border: none; background: #17150F; color: #FFFFFF; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600">Refazer</button>
+</div>
+</div>
+<div style="margin-top: auto; padding-top: 14px; border-top: 1px solid #EFEAE1; display: flex; justify-content: space-between; font-size: 13px; color: #5E584C">
+<span>Legenda · 212/2.200</span><span>9 hashtags · alt text ok</span>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { sel: 1, format: 'carousel' };
+}
+renderVals() {
+const data = [
+{ title: 'Saiu a programação do festival de verão', body: 'Tudo o que você precisa saber em 7 slides.' },
+{ title: 'Quando e onde', body: '[DATAS] no [LOCAL]. Ingressos à venda a partir de [DATA].' },
+{ title: 'Quem abre a noite', body: '[ARTISTA 1] e [ARTISTA 2] no primeiro dia.' },
+{ title: 'Os destaques', body: '[ARTISTA 3], [ARTISTA 4] e [ARTISTA 5] fecham o fim de semana.' },
+{ title: 'Quanto custa', body: 'Ingressos de [PREÇO] a [PREÇO], com meia-entrada.' },
+{ title: 'Como chegar', body: 'Linhas de ônibus e estacionamento: [INFO].' },
+{ title: 'Salve e compartilhe', body: 'Marque quem vai com você. Siga @suamarca para mais agenda.' }
+];
+const slides = data.map((d, i) => ({
+n: i + 1,
+num: String(i + 1).padStart(2, '0'),
+title: d.title,
+body: d.body,
+ring: i === this.state.sel ? '2px solid #E4572E' : '1px solid #3D382F',
+dot: i === this.state.sel ? '#1F4A73' : '#D8D1C4',
+pick: () => this.setState({ sel: i, format: 'carousel' })
+}));
+const isCarousel = this.state.format === 'carousel';
+return {
+slides,
+current: slides[this.state.sel],
+isCarousel,
+isStory: !isCarousel,
+tabCarousel: isCarousel ? '#FFFFFF' : 'transparent',
+tabStory: isCarousel ? 'transparent' : '#FFFFFF',
+toCarousel: () => this.setState({ format: 'carousel' }),
+toStory: () => this.setState({ format: 'story' })
+};
+}
+}
+</script>
+</body>
+</html>

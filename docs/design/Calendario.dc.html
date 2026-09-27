@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Pauta — Calendário</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F6F3EE}
+a{color:#17150F}a:hover{color:#9E3113}
+nav a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #F6F3EE; color: #17150F; font-family: Manrope, sans-serif; overflow: hidden">
+<nav aria-label="Principal" style="width: 232px; flex-shrink: 0; box-sizing: border-box; padding: 28px 18px; background: #17150F; color: #F6F3EE; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 10px 28px">
+<div style="width: 34px; height: 34px; border-radius: 9px; background: #E4572E; display: flex; align-items: center; justify-content: center; font-family: Fraunces, serif; font-weight: 700; font-size: 20px; color: #17150F">P</div>
+<span style="font-family: Fraunces, serif; font-size: 26px; font-weight: 600">Pauta</span>
+</div>
+<a href="Main.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; color: #C9C2B4">Dashboard</a>
+<a href="Radar.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; color: #C9C2B4">Radar de pautas</a>
+<a href="Estudio.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; color: #C9C2B4">Estúdio</a>
+<a href="Calendario.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 600; color: #FFFFFF; background: #2E2A22">Calendário</a>
+<a href="BrandKit.dc.html" style="padding: 11px 12px; border-radius: 8px; text-decoration: none; font-size: 15px; color: #C9C2B4">Brand Kit</a>
+<div style="margin-top: auto; padding: 14px 12px; border-radius: 10px; background: #2E2A22; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12px; color: #C9C2B4">Marca ativa</span>
+<span style="font-size: 15px; font-weight: 600">[SUA MARCA]</span>
+<span style="font-size: 13px; color: #C9C2B4">@suamarca · Instagram</span>
+</div>
+</nav>
+<main style="flex-grow: 1; min-width: 0; box-sizing: border-box; padding: 36px 44px; display: flex; flex-direction: column; gap: 20px">
+<header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: Fraunces, serif; font-size: 40px; font-weight: 600; letter-spacing: -0.02em">28 set – 4 out</h1>
+<span style="font-size: 14px; color: #5E584C">11 posts agendados · piloto automático ligado (10 por semana, com aprovação)</span>
+</div>
+<div style="display: flex; gap: 8px; align-items: center">
+<button type="button" aria-label="Semana anterior" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #D8D1C4; background: #FFFFFF; font-size: 18px">‹</button>
+<button type="button" aria-label="Próxima semana" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #D8D1C4; background: #FFFFFF; font-size: 18px">›</button>
+<div style="display: flex; padding: 4px; gap: 2px; border-radius: 10px; background: #EFEAE1">
+<button type="button" style="padding: 9px 14px; border: none; border-radius: 8px; background: #FFFFFF; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600">Semana</button>
+<button type="button" style="padding: 9px 14px; border: none; border-radius: 8px; background: transparent; font-family: Manrope, sans-serif; font-size: 14px; font-weight: 600; color: #5E584C">Mês</button>
+</div>
+</div>
+</header>
+<div style="display: flex; gap: 16px; align-items: center; font-size: 13px; font-weight: 600">
+<span style="padding: 4px 10px; border-radius: 6px; background: #FBE3DA; color: #9E3113">Carrossel</span>
+<span style="padding: 4px 10px; border-radius: 6px; background: #DCE7F2; color: #1F4A73">Feed</span>
+<span style="padding: 4px 10px; border-radius: 6px; background: #F5EBCF; color: #6B4E0C">Story</span>
+<span style="padding: 4px 10px; border-radius: 6px; background: #DDEBE1; color: #2E5C3F">Reel</span>
+<span style="color: #5E584C; font-weight: 500">Borda tracejada = aguardando aprovação · Assistida = o app envia a mídia e você posta</span>
+</div>
+<div style="flex-grow: 1; min-height: 0; border-radius: 16px; background: #FFFFFF; border: 1px solid #E4DED3; overflow: hidden; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); border-bottom: 1px solid #E4DED3">
+<div></div>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+<div style="padding: 12px 10px; border-left: 1px solid #EFEAE1; display: flex; gap: 6px; align-items: baseline"><span style="font-size: 13px; color: #5E584C">{{d.name}}</span><span style="font-family: Fraunces, serif; font-size: 20px; font-weight: 600">{{d.date}}</span></div>
+</sc-for>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<div style="flex-grow: 1; display: grid; grid-template-columns: 64px repeat(7, minmax(0, 1fr)); border-bottom: 1px solid #EFEAE1">
+<div style="padding: 10px; font-size: 13px; color: #5E584C">{{r.time}}</div>
+<sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7">
+<div style="padding: 8px; border-left: 1px solid #EFEAE1; display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{c.posts}}" as="p" hint-placeholder-count="1">
+<div style="padding: 8px 10px; border-radius: 8px; background: {{p.bg}}; color: {{p.fg}}; border: {{p.border}}; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em">{{p.kind}}</span>
+<span style="font-size: 13px; font-weight: 600; line-height: 1.25; color: #17150F">{{p.title}}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+const fmt = {
+carrossel: { bg: '#FBE3DA', fg: '#9E3113', label: 'CARROSSEL' },
+feed: { bg: '#DCE7F2', fg: '#1F4A73', label: 'FEED' },
+story: { bg: '#F5EBCF', fg: '#6B4E0C', label: 'STORY' },
+reel: { bg: '#DDEBE1', fg: '#2E5C3F', label: 'REEL' }
+};
+const times = ['09:00', '12:00', '15:00', '18:00', '21:00'];
+const posts = [
+{ d: 0, t: 1, f: 'carrossel', title: 'Festival de verão: programação' },
+{ d: 0, t: 3, f: 'story', title: 'Qual show você quer ver?', assisted: true },
+{ d: 1, t: 0, f: 'feed', title: 'Frase da semana' },
+{ d: 1, t: 3, f: 'reel', title: '3 bastidores do estúdio' },
+{ d: 2, t: 1, f: 'carrossel', title: 'Streaming e pagamento a artistas' },
+{ d: 2, t: 4, f: 'story', title: 'Resumo do dia' },
+{ d: 3, t: 3, f: 'reel', title: 'IA na produção musical', pending: true },
+{ d: 4, t: 1, f: 'feed', title: 'Agenda do fim de semana', pending: true },
+{ d: 4, t: 3, f: 'carrossel', title: '5 shows imperdíveis' },
+{ d: 5, t: 2, f: 'story', title: 'Agenda de hoje' },
+{ d: 6, t: 1, f: 'carrossel', title: 'O que rolou na semana' }
+];
+const names = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+const dates = ['28', '29', '30', '1', '2', '3', '4'];
+return {
+days: names.map((n, i) => ({ name: n, date: dates[i] })),
+rows: times.map((time, t) => ({
+time,
+cells: names.map((_, d) => ({
+posts: posts.filter(p => p.d === d && p.t === t).map(p => ({
+kind: fmt[p.f].label + (p.assisted ? ' · ASSISTIDA' : ''),
+title: p.title,
+bg: fmt[p.f].bg,
+fg: fmt[p.f].fg,
+border: p.pending ? '1.5px dashed ' + fmt[p.f].fg : '1.5px solid ' + fmt[p.f].bg
+}))
+}))
+}))
+};
+}
+}
+</script>
+</body>
+</html>

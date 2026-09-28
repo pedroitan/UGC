@@ -1,28 +1,37 @@
 import "server-only";
 import { z } from "zod";
 
+// Vars criadas vazias (ex.: import do .env.example na Vercel) contam como
+// "não definidas" — não devem derrubar a validação.
+const blank = (v: unknown) =>
+  typeof v === "string" && v.trim() === "" ? undefined : v;
+const optStr = z.preprocess(blank, z.string().min(1).optional());
+const optUrl = z.preprocess(blank, z.url().optional());
+const optEnum = <T extends [string, ...string[]]>(values: T, fallback: T[number]) =>
+  z.preprocess(blank, z.enum(values).default(fallback));
+
 const serverEnvSchema = z.object({
-  NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
-  NEXT_PUBLIC_SUPABASE_URL: z.url().or(z.literal("")).default(""),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().default(""),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
-  TOKEN_ENCRYPTION_KEY: z.string().min(1).optional(),
-  CRON_SECRET: z.string().min(1).optional(),
-  META_APP_ID: z.string().min(1).optional(),
-  META_APP_SECRET: z.string().min(1).optional(),
-  META_REDIRECT_URI: z.url().optional(),
-  ANTHROPIC_API_KEY: z.string().min(1).optional(),
-  ANTHROPIC_MODEL: z.string().min(1).default("claude-sonnet-4-5"),
-  SEARCH_PROVIDER: z.enum(["tavily", "exa", "serper"]).default("tavily"),
-  TAVILY_API_KEY: z.string().min(1).optional(),
-  EXA_API_KEY: z.string().min(1).optional(),
-  SERPER_API_KEY: z.string().min(1).optional(),
-  MEDIA_PROVIDER: z.enum(["kie", "higgsfield"]).default("kie"),
-  KIE_API_KEY: z.string().min(1).optional(),
-  HIGGSFIELD_API_KEY: z.string().min(1).optional(),
-  MEDIA_WEBHOOK_SECRET: z.string().min(1).optional(),
-  UNSPLASH_ACCESS_KEY: z.string().min(1).optional(),
-  PEXELS_API_KEY: z.string().min(1).optional(),
+  NEXT_PUBLIC_APP_URL: z.preprocess(blank, z.url().default("http://localhost:3000")),
+  NEXT_PUBLIC_SUPABASE_URL: z.preprocess(blank, z.url().or(z.literal("")).default("")),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.preprocess(blank, z.string().default("")),
+  SUPABASE_SERVICE_ROLE_KEY: optStr,
+  TOKEN_ENCRYPTION_KEY: optStr,
+  CRON_SECRET: optStr,
+  META_APP_ID: optStr,
+  META_APP_SECRET: optStr,
+  META_REDIRECT_URI: optUrl,
+  ANTHROPIC_API_KEY: optStr,
+  ANTHROPIC_MODEL: z.preprocess(blank, z.string().min(1).default("claude-sonnet-4-5")),
+  SEARCH_PROVIDER: optEnum(["tavily", "exa", "serper"], "tavily"),
+  TAVILY_API_KEY: optStr,
+  EXA_API_KEY: optStr,
+  SERPER_API_KEY: optStr,
+  MEDIA_PROVIDER: optEnum(["kie", "higgsfield"], "kie"),
+  KIE_API_KEY: optStr,
+  HIGGSFIELD_API_KEY: optStr,
+  MEDIA_WEBHOOK_SECRET: optStr,
+  UNSPLASH_ACCESS_KEY: optStr,
+  PEXELS_API_KEY: optStr,
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

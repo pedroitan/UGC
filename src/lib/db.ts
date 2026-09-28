@@ -3,6 +3,7 @@ import "server-only";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { DEV_USER, DEV_WORKSPACE, isDevBypass } from "@/lib/dev-auth";
 import { createClient } from "@/lib/supabase/server";
+import { serverEnv } from "@/lib/env";
 import { devId, getDevStore } from "@/lib/dev-store";
 import type {
   BrandKitRow,
@@ -25,6 +26,10 @@ import type {
 // (requer o banco local rodando). Casts ficam confinados neste módulo.
 
 async function currentUser(): Promise<User | null> {
+  // Sem credenciais do Supabase (deploy sem envs), trata como deslogado —
+  // o proxy redireciona para /login em vez de quebrar a página.
+  const env = serverEnv();
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return null;
   const supabase = await createClient();
   const {
     data: { user },

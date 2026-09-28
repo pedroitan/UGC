@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ["@resvg/resvg-js", "satori"],
+  outputFileTracingIncludes: {
+    "/api/render/**": ["./node_modules/@fontsource/**/*.woff"],
+  },
 };
 
 export default nextConfig;

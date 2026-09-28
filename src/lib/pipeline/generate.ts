@@ -3,9 +3,11 @@ import "server-only";
 import {
   getBrandKit,
   getPauta,
+  getPost,
   insertPipelineRun,
   insertPost,
   updatePautaStatus,
+  updatePostScript,
 } from "@/lib/db";
 import { getLLMProvider } from "@/lib/providers";
 import type { BrandKitRow, PautaRow, PostFormat, PostRow } from "@/types/db";
@@ -199,6 +201,87 @@ export async function generatePost(
 
   await updatePautaStatus(pautaId, "used");
   return post;
+}
+
+/**
+ * "Pedir ajuste à IA": refaz só a etapa de script com uma instrução extra,
+ * mantendo o post (e suas mídias) — registra PipelineRun próprio.
+ */
+export async function adjustPostScript(
+  postId: string,
+  instruction: string,
+): Promise<PostRow> {
+  const post = await getPost(postId);
+  if (!post) throw new Error("Post não encontrado");
+  const pauta = post.pauta_id ? await getPauta(post.pauta_id) : null;
+  if (!pauta) throw new Error("Pauta de origem não encontrada");
+
+  const kit = await getBrandKit(post.workspace_id);
+  const { system, prompt } = buildPrompt(pauta, kit, post.format);
+  const llm = getLLMProvider();
+
+  const current = JSON.stringify(getSlidesForPrompt(post.script));
+  const adjustPrompt = `${prompt}
+
+Script atual (JSON):
+${current}
+
+Ajuste pedido pelo editor: ${instruction}
+Reescreva o script inteiro aplicando o ajuste, mantendo o formato JSON.`;
+
+  let script: GeneratedScript = normalizeScript(post.script, pauta);
+  let providerName = "fallback";
+  let cost = 0;
+  let runStatus: "done" | "failed" = "done";
+  let llmRaw: unknown = null;
+
+  if (llm.name !== "mock") {
+    try {
+      const result = await llm.complete({
+        system,
+        prompt: adjustPrompt,
+        jsonSchema: SLIDES_SCHEMA,
+        maxTokens: 2048,
+      });
+      llmRaw = result.json;
+      cost = result.costUsd ?? 0;
+      providerName = llm.name;
+      script = normalizeScript(result.json, pauta);
+    } catch {
+      runStatus = "failed";
+    }
+  }
+
+  const similarity = maxSimilarityToSources(
+    scriptToText(script),
+    pauta.citations.map((c) => c.snippet),
+  );
+
+  const prevMeta = (post.script as { _meta?: Record<string, unknown> })._meta ?? {};
+  await updatePostScript(post.id, {
+    ...post.script,
+    ...script,
+    _meta: { ...prevMeta, similarity, provider: providerName },
+  });
+
+  await insertPipelineRun({
+    post_id: post.id,
+    workspace_id: post.workspace_id,
+    stage: "script",
+    input: { pauta_id: pauta.id, format: post.format, instruction },
+    output: { script, similarity, raw: llmRaw },
+    provider: providerName,
+    external_task_id: null,
+    status: runStatus,
+    cost,
+  });
+
+  return (await getPost(post.id)) ?? post;
+}
+
+function getSlidesForPrompt(script: Record<string, unknown>): unknown {
+  const { _meta: _omit, ...rest } = script as Record<string, unknown>;
+  return rest;
 }
 
 function normalizeScript(json: unknown, pauta: PautaRow): GeneratedScript {

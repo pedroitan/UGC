@@ -8,6 +8,7 @@ import type {
   BrandKitRow,
   KeywordKind,
   KeywordRow,
+  MediaAssetRow,
   PautaRow,
   PautaStatus,
   PipelineRunRow,
@@ -331,6 +332,45 @@ export async function insertPost(
   return data as unknown as PostRow;
 }
 
+export async function updatePostScript(
+  id: string,
+  script: Record<string, unknown>,
+): Promise<void> {
+  const now = new Date().toISOString();
+  if (isDevBypass()) {
+    const p = getDevStore().posts.find((x) => x.id === id);
+    if (p) {
+      p.script = script;
+      p.updated_at = now;
+    }
+    return;
+  }
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("posts")
+    .update({ script, updated_at: now })
+    .eq("id", id);
+  if (error) throw new Error(`Erro ao atualizar script do post: ${error.message}`);
+}
+
+export async function updatePostContent(
+  id: string,
+  patch: Partial<Pick<PostRow, "caption" | "hashtags" | "alt_text">>,
+): Promise<void> {
+  const now = new Date().toISOString();
+  if (isDevBypass()) {
+    const p = getDevStore().posts.find((x) => x.id === id);
+    if (p) Object.assign(p, patch, { updated_at: now });
+    return;
+  }
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("posts")
+    .update({ ...patch, updated_at: now })
+    .eq("id", id);
+  if (error) throw new Error(`Erro ao atualizar post: ${error.message}`);
+}
+
 export async function updatePostStatus(id: string, status: PostStatus): Promise<void> {
   const now = new Date().toISOString();
   if (isDevBypass()) {
@@ -347,6 +387,86 @@ export async function updatePostStatus(id: string, status: PostStatus): Promise<
     .update({ status, updated_at: now })
     .eq("id", id);
   if (error) throw new Error(`Erro ao atualizar post: ${error.message}`);
+}
+
+// --- Media assets --------------------------------------------------------------
+
+export async function listMediaAssets(postId: string): Promise<MediaAssetRow[]> {
+  if (isDevBypass()) {
+    return getDevStore()
+      .assets.filter((a) => a.post_id === postId)
+      .sort((a, b) => a.order - b.order);
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("media_assets")
+    .select("*")
+    .eq("post_id", postId)
+    .order("order", { ascending: true });
+  if (error) throw new Error(`Erro ao listar assets: ${error.message}`);
+  return (data ?? []) as unknown as MediaAssetRow[];
+}
+
+export async function getMediaAsset(id: string): Promise<MediaAssetRow | null> {
+  if (isDevBypass()) {
+    return getDevStore().assets.find((a) => a.id === id) ?? null;
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("media_assets")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`Erro ao buscar asset: ${error.message}`);
+  return (data as unknown as MediaAssetRow | null) ?? null;
+}
+
+export async function insertMediaAsset(
+  values: Omit<MediaAssetRow, "id" | "created_at">,
+  png?: Buffer,
+): Promise<MediaAssetRow> {
+  if (isDevBypass()) {
+    const store = getDevStore();
+    const asset: MediaAssetRow = {
+      ...values,
+      id: devId(),
+      created_at: new Date().toISOString(),
+    };
+    if (png) {
+      asset.url = `/api/media/${asset.id}`;
+      store.blobs.set(asset.id, png);
+    }
+    store.assets.push(asset);
+    return asset;
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("media_assets")
+    .insert(values)
+    .select("*")
+    .single();
+  if (error) throw new Error(`Erro ao salvar asset: ${error.message}`);
+  return data as unknown as MediaAssetRow;
+}
+
+/** PNG guardado em memória no modo dev (servido por /api/media/[id]). */
+export function getDevMediaBlob(id: string): Buffer | null {
+  if (!isDevBypass()) return null;
+  return getDevStore().blobs.get(id) ?? null;
+}
+
+export async function deleteMediaAssets(postId: string): Promise<void> {
+  if (isDevBypass()) {
+    const store = getDevStore();
+    for (const a of store.assets.filter((x) => x.post_id === postId)) {
+      store.blobs.delete(a.id);
+    }
+    store.assets = store.assets.filter((x) => x.post_id !== postId);
+    return;
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.from("media_assets").delete().eq("post_id", postId);
+  if (error) throw new Error(`Erro ao remover assets: ${error.message}`);
 }
 
 // --- PipelineRun ---------------------------------------------------------------

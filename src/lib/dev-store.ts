@@ -2,6 +2,7 @@ import "server-only";
 
 import type {
   KeywordRow,
+  MediaAssetRow,
   PautaRow,
   PipelineRunRow,
   PostRow,
@@ -18,6 +19,9 @@ interface DevStore {
   pautas: PautaRow[];
   posts: PostRow[];
   runs: PipelineRunRow[];
+  assets: MediaAssetRow[];
+  /** PNGs renderizados no modo dev, servidos por /api/media/[id]. */
+  blobs: Map<string, Buffer>;
 }
 
 const WS = DEV_WORKSPACE.id;
@@ -108,6 +112,8 @@ function seed(): DevStore {
     ],
     posts: [],
     runs: [],
+    assets: [],
+    blobs: new Map(),
   };
 }
 

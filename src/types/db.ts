@@ -143,3 +143,30 @@ export interface PipelineRunRow {
   cost: number;
   created_at: string;
 }
+
+export type MediaAssetType = "image" | "video" | "cover" | "audio";
+
+export interface MediaAssetRow {
+  id: string;
+  post_id: string;
+  workspace_id: string;
+  order: number;
+  type: MediaAssetType;
+  url: string | null;
+  width: number | null;
+  height: number | null;
+  duration_s: number | null;
+  provider: string | null;
+  created_at: string;
+}
+
+export interface TemplateRow {
+  id: string;
+  workspace_id: string | null;
+  format: PostFormat;
+  name: string;
+  jsx_source: string;
+  slots: Record<string, unknown>;
+  is_system: boolean;
+  created_at: string;
+}

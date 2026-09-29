@@ -739,6 +739,158 @@ function Moderno(slide: SlideInput, size: { width: number; height: number }): Re
   );
 }
 
+// --- Template 7: Expo (cartaz de exposição: papel, fileiras finas, foto) -------
+
+function Expo(slide: SlideInput, size: { width: number; height: number }): ReactNode {
+  const tall = size.height > size.width;
+  const pad = tall ? 88 : 64;
+  const rule = (mt = 0) => (
+    <div
+      key={mt}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        marginTop: mt,
+      }}
+    >
+      <div style={{ height: 2, backgroundColor: TOKENS.ink }} />
+      <div style={{ height: 2, backgroundColor: TOKENS.ink }} />
+    </div>
+  );
+  const photoH = slide.image ? Math.round(size.height * 0.34) : 0;
+  return (
+    <div
+      style={{
+        width: size.width,
+        height: size.height,
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: TOKENS.paper,
+        color: TOKENS.ink,
+        padding: pad,
+      }}
+    >
+      {rule()}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontFamily: M,
+          fontSize: 22,
+          fontWeight: 700,
+          letterSpacing: 5,
+          textTransform: "uppercase",
+          padding: "14px 0",
+        }}
+      >
+        <span>Pauta · Nº {String(slide.n).padStart(2, "0")}</span>
+        <span>
+          {slide.n}/{slide.total}
+        </span>
+      </div>
+      {rule()}
+      <span
+        style={{
+          fontFamily: M,
+          fontSize: slide.image ? (tall ? 84 : 68) : tall ? 110 : 88,
+          fontWeight: 800,
+          lineHeight: 0.98,
+          letterSpacing: -2,
+          textTransform: "uppercase",
+          marginTop: slide.image ? (tall ? 44 : 32) : tall ? 56 : 40,
+        }}
+      >
+        {slide.title}
+      </span>
+      {slide.image && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: photoH,
+            marginTop: tall ? 40 : 32,
+            backgroundImage: `url(${slide.image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              padding: tall ? 48 : 32,
+            }}
+          >
+            <span
+              style={{
+                fontFamily: F,
+                fontStyle: "italic",
+                fontSize: tall ? 84 : 64,
+                fontWeight: 500,
+                color: slide.accent,
+                lineHeight: 1,
+              }}
+            >
+              {slide.eyebrow}
+            </span>
+          </div>
+          <div
+            style={{
+              marginTop: "auto",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderTop: `2px solid ${TOKENS.ink}`,
+              backgroundColor: TOKENS.paper,
+              padding: "16px 20px",
+              fontFamily: M,
+              fontSize: 20,
+              fontWeight: 700,
+              letterSpacing: 4,
+              textTransform: "uppercase",
+            }}
+          >
+            <span>«</span>
+            <span>{slide.handle}</span>
+            <span>»</span>
+          </div>
+        </div>
+      )}
+      {slide.body && (
+        <span
+          style={{
+            fontFamily: M,
+            fontSize: tall ? 32 : 27,
+            fontWeight: 500,
+            lineHeight: 1.5,
+            letterSpacing: 1,
+            color: TOKENS.muted,
+            marginTop: slide.image ? (tall ? 32 : 24) : tall ? 44 : 32,
+          }}
+        >
+          {slide.body}
+        </span>
+      )}
+      <div style={{ marginTop: "auto", display: "flex", flexDirection: "column" }}>{rule()}</div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontFamily: M,
+          fontSize: 22,
+          fontWeight: 700,
+          letterSpacing: 5,
+          textTransform: "uppercase",
+          padding: "14px 0 0",
+        }}
+      >
+        <span>{slide.eyebrow}</span>
+        <span>{slide.handle}</span>
+      </div>
+    </div>
+  );
+}
+
 export const TEMPLATES: TemplateDef[] = [
   { key: "manchete-escura", name: "Manchete escura", swatch: TOKENS.ink, render: MancheteEscura },
   { key: "papel", name: "Papel", swatch: TOKENS.paper, render: Papel },
@@ -746,6 +898,7 @@ export const TEMPLATES: TemplateDef[] = [
   { key: "foto", name: "Foto", swatch: TOKENS.muted, render: Foto },
   { key: "letreiro", name: "Letreiro", swatch: TOKENS.line, render: Letreiro },
   { key: "moderno", name: "Moderno", swatch: "#F5E000", render: Moderno },
+  { key: "expo", name: "Expo", swatch: "#4ADE57", render: Expo },
 ];
 
 export const DEFAULT_TEMPLATE = "manchete-escura";

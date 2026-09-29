@@ -37,7 +37,7 @@ export async function addSourceAction(formData: FormData) {
     .object({
       name: z.string().trim().min(1).max(80),
       url: z.string().trim().url().or(z.literal("")),
-      type: z.enum(["rss", "site"]).default("rss"),
+      type: z.enum(["rss", "site", "google_news"]).default("rss"),
     })
     .safeParse({
       name: formData.get("name"),
@@ -45,6 +45,7 @@ export async function addSourceAction(formData: FormData) {
       type: formData.get("type") ?? "rss",
     });
   if (!parsed.success) return;
+  if (parsed.data.type !== "google_news" && !parsed.data.url) return;
   await addSource(workspace.id, {
     type: parsed.data.type,
     url: parsed.data.url || null,

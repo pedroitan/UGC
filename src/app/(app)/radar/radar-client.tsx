@@ -167,7 +167,15 @@ export function RadarClient({
               className="mt-2 flex flex-col gap-2"
             >
               <Input name="name" placeholder="Nome da fonte" required className="h-9 text-[13px]" />
-              <Input name="url" type="url" placeholder="https://…/feed.xml" required className="h-9 text-[13px]" />
+              <select
+                name="type"
+                defaultValue="rss"
+                className="h-9 rounded-md border border-input bg-background px-2 text-[13px]"
+              >
+                <option value="rss">Feed RSS / site</option>
+                <option value="google_news">Google Notícias (usa suas palavras-chave)</option>
+              </select>
+              <Input name="url" type="url" placeholder="https://…/feed.xml (obrigatório p/ RSS)" className="h-9 text-[13px]" />
               <Button type="submit" variant="outline" size="sm" disabled={pending}>
                 <Plus className="h-4 w-4" /> Adicionar fonte ou RSS
               </Button>

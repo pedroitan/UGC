@@ -1,4 +1,4 @@
-# Pauta (nome provisório)
+# AgendaInsta
 
 App web que transforma notícias e tendências de um nicho em posts prontos para o Instagram (carrossel, feed, story e reel), com a identidade da marca, e agenda a publicação pela API oficial da Meta. O humano revisa e aprova.
 

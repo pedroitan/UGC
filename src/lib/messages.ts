@@ -1,7 +1,7 @@
 // Textos da interface em pt-BR. Centralizados para facilitar i18n futuro.
 export const m = {
   app: {
-    name: "Pauta",
+    name: "AgendaInsta",
     tagline: "Notícias do seu nicho viram posts prontos para o Instagram.",
   },
   nav: {

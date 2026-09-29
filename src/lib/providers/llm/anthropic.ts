@@ -8,14 +8,18 @@ const PRICE_PER_MTOK: Record<string, { input: number; output: number }> = {
 };
 
 export class AnthropicLLMProvider implements LLMProvider {
-  readonly name = "anthropic";
+  readonly name: string;
   private client: Anthropic;
 
   constructor(
     apiKey: string,
     private model = "claude-sonnet-4-5",
+    opts: { baseURL?: string; name?: string } = {},
   ) {
-    this.client = new Anthropic({ apiKey });
+    this.name = opts.name ?? "anthropic";
+    // kie.ai expõe Claude em endpoint compatível (POST /claude/v1/messages,
+    // auth x-api-key) — basta apontar o baseURL do SDK.
+    this.client = new Anthropic({ apiKey, ...(opts.baseURL ? { baseURL: opts.baseURL } : {}) });
   }
 
   async complete(request: LLMRequest): Promise<LLMResult> {

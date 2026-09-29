@@ -31,6 +31,14 @@ export function getSearchProvider(): SearchProvider {
 
 export function getLLMProvider(): LLMProvider {
   const env = serverEnv();
+  // Toda chamada de LLM pode sair pelo kie.ai (endpoint Claude-compatível):
+  // uma única conta/chave cobre chat + mídia.
+  if (env.LLM_PROVIDER === "kie" && env.KIE_API_KEY) {
+    return new AnthropicLLMProvider(env.KIE_API_KEY, env.KIE_CHAT_MODEL, {
+      baseURL: "https://api.kie.ai/claude",
+      name: "kie",
+    });
+  }
   return env.ANTHROPIC_API_KEY
     ? new AnthropicLLMProvider(env.ANTHROPIC_API_KEY, env.ANTHROPIC_MODEL)
     : new MockLLMProvider();

@@ -33,6 +33,8 @@ export interface SlideInput {
   handle: string;
   /** Cor de destaque (Brand Kit colors[0] ou TOKENS.accent). */
   accent: string;
+  /** Foto da matéria de origem (og:image/enclosure), quando disponível. */
+  image?: string;
 }
 
 export interface TemplateDef {
@@ -323,7 +325,11 @@ function Foto(slide: SlideInput, size: { width: number; height: number }): React
         style={{
           display: "flex",
           height: mediaH,
-          backgroundImage: `linear-gradient(135deg, ${slide.accent} 0%, ${TOKENS.ink} 130%)`,
+          backgroundImage: slide.image
+            ? `url(${slide.image})`
+            : `linear-gradient(135deg, ${slide.accent} 0%, ${TOKENS.ink} 130%)`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           alignItems: "flex-end",
           padding: 48,
         }}

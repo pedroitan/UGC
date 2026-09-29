@@ -179,7 +179,11 @@ export async function generatePost(
     template_id: null,
     script: {
       ...script,
-      _meta: { similarity, provider: providerName },
+      _meta: {
+        similarity,
+        provider: providerName,
+        image: pauta.citations.find((c) => c.image_url)?.image_url,
+      },
     } as Record<string, unknown>,
     caption: script.caption,
     hashtags: script.hashtags,

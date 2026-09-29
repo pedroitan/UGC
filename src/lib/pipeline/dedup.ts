@@ -9,6 +9,8 @@ export interface DedupItem {
   snippet: string;
   publishedAt?: string;
   sourceName?: string;
+  /** Imagem da matéria (enclosure/media:content do RSS ou og:image). */
+  imageUrl?: string;
 }
 
 export interface DedupCluster {

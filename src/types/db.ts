@@ -82,6 +82,7 @@ export interface PautaCitation {
   snippet: string;
   published_at?: string;
   source_name?: string;
+  image_url?: string;
 }
 
 export type PautaStatus = "new" | "used" | "dismissed";

@@ -72,6 +72,7 @@ export function buildSlideInput(
     cta: s.cta,
     handle: resolveHandle(kit),
     accent: accentColor(kit),
+    image: (post.script as { _meta?: { image?: string } })._meta?.image,
   };
 }
 
@@ -86,11 +87,14 @@ export async function renderSlide(
   const size = SLIDE_SIZES[post.format];
   const template = getTemplate(getTemplateKey(post));
   const fonts = await loadFonts();
-  const svg = await satori(template.render(input, size), {
-    width: size.width,
-    height: size.height,
-    fonts,
-  });
+  const opts = { width: size.width, height: size.height, fonts };
+  let svg: string;
+  try {
+    svg = await satori(template.render(input, size), opts);
+  } catch {
+    // Imagem remota pode falhar (hotlink/offline) — refaz sem ela.
+    svg = await satori(template.render({ ...input, image: undefined }, size), opts);
+  }
   return { svg, ...size };
 }
 

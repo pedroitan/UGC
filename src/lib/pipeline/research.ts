@@ -22,6 +22,36 @@ export interface ResearchResult {
 
 const parser = new Parser();
 
+function rssItemImage(item: Parser.Item & Record<string, unknown>): string | undefined {
+  const enclosure = item.enclosure?.url;
+  if (enclosure && /\.(jpe?g|png|webp|avif)/i.test(enclosure)) return enclosure;
+  const media = item["media:content"] ?? item["media:thumbnail"];
+  const mediaUrl = Array.isArray(media) ? media[0]?.$?.url : (media as { $?: { url?: string } })?.$?.url;
+  if (mediaUrl) return mediaUrl;
+  const html = String(item.content ?? item["content:encoded"] ?? "");
+  return html.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1];
+}
+
+/** Tenta o og:image/twitter:image da página da matéria (4s de timeout). */
+async function fetchOgImage(url: string): Promise<string | undefined> {
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      signal: AbortSignal.timeout(4_000),
+      headers: { "user-agent": "Mozilla/5.0 (compatible; PautaBot/1.0)" },
+    });
+    if (!res.ok) return undefined;
+    const html = (await res.text()).slice(0, 400_000);
+    return (
+      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)?.[1] ??
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)?.[1] ??
+      html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)?.[1]
+    );
+  } catch {
+    return undefined;
+  }
+}
+
 async function fetchRssItems(url: string, sourceName: string): Promise<DedupItem[]> {
   try {
     const feed = await parser.parseURL(url);
@@ -31,6 +61,7 @@ async function fetchRssItems(url: string, sourceName: string): Promise<DedupItem
       snippet: (item.contentSnippet ?? item.content ?? "").slice(0, 500),
       publishedAt: item.isoDate ?? item.pubDate,
       sourceName,
+      imageUrl: rssItemImage(item),
     }));
   } catch {
     return [];
@@ -105,6 +136,18 @@ export async function runResearch(workspaceId: string): Promise<ResearchResult> 
     (c) => !existingTokens.some((t) => jaccard(titleTokens(c.representative.title), t) >= 0.55),
   );
 
+  // 3b) Imagem da matéria: para itens sem imagem no RSS, tenta o og:image
+  // da página (limitado aos clusters novos, em paralelo, timeout no fetch).
+  await Promise.all(
+    fresh.slice(0, 12).map(async (cluster) => {
+      for (const item of cluster.items) {
+        if (item.imageUrl) continue;
+        item.imageUrl = await fetchOgImage(item.url);
+        if (item.imageUrl) break;
+      }
+    }),
+  );
+
   // 4) Score + persistência
   const includeWeighted = include.map((k) => ({ term: k.term, weight: k.weight }));
   const pautas: Omit<PautaRow, "id" | "created_at">[] = fresh.map((cluster) => {
@@ -125,6 +168,7 @@ export async function runResearch(workspaceId: string): Promise<ResearchResult> 
         snippet: i.snippet.slice(0, 500),
         published_at: i.publishedAt,
         source_name: i.sourceName,
+        image_url: i.imageUrl,
       })),
       published_at: rep.publishedAt ?? oldest ?? null,
       score: scorePauta({

@@ -82,11 +82,12 @@ export async function renderSlide(
   index: number,
   kit: BrandKitRow | null,
   keywords: KeywordRow[],
+  templateKey?: string,
 ): Promise<{ svg: string; width: number; height: number } | null> {
   const input = buildSlideInput(post, index, kit, keywords);
   if (!input) return null;
   const size = SLIDE_SIZES[post.format];
-  const template = getTemplate(getTemplateKey(post));
+  const template = getTemplate(templateKey ?? getTemplateKey(post));
   const fonts = await loadFonts();
   const opts = { width: size.width, height: size.height, fonts };
   let svg: string;

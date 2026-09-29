@@ -50,8 +50,9 @@ function slidesOf(post: PostRow | null): ScriptSlide[] {
   return Array.isArray(s) ? s : [];
 }
 
-function renderUrl(postId: string, index: number, version: string) {
-  return `/api/render/${postId}/${index}.svg?v=${encodeURIComponent(version)}`;
+function renderUrl(postId: string, index: number, version: string, template?: string) {
+  const t = template ? `&t=${encodeURIComponent(template)}` : "";
+  return `/api/render/${postId}/${index}.svg?v=${encodeURIComponent(version)}${t}`;
 }
 
 export function EstudioClient({
@@ -89,7 +90,13 @@ export function EstudioClient({
   const sourceImage = meta?.image;
   const useImage = Boolean(sourceImage) && meta?.useImage !== false;
   const [renderTick, setRenderTick] = useState(0);
+  const [previewTpl, setPreviewTpl] = useState<{ postId: string; key: string } | null>(null);
   const version = `${selected?.updated_at ?? "0"}:${renderTick}`;
+  // Template em preview: vale antes de o save voltar do servidor.
+  const activeTemplate =
+    previewTpl && previewTpl.postId === selected?.id
+      ? previewTpl.key
+      : (templateKey ?? undefined);
 
   function run(fn: () => Promise<unknown>, ok: string) {
     startTransition(async () => {
@@ -209,7 +216,7 @@ export function EstudioClient({
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={renderUrl(selected.id, i, version)}
+                    src={renderUrl(selected.id, i, version, activeTemplate)}
                     alt={s.title ?? `Slide ${i + 1}`}
                     className="h-full w-full object-cover"
                   />
@@ -225,6 +232,7 @@ export function EstudioClient({
                 index={index}
                 onSelect={setSel}
                 version={version}
+                template={activeTemplate}
                 story={isStoryLike}
                 handle={handle}
               />
@@ -311,12 +319,14 @@ export function EstudioClient({
                       key={t.key}
                       type="button"
                       title={t.name}
-                      disabled={pending}
-                      onClick={() =>
-                        run(() => setTemplateAction(selected.id, t.key), `Template: ${t.name}`)
-                      }
+                      onClick={() => {
+                        // Preview imediato via ?t= na URL do render — o save
+                        // roda em background e o refresh só confirma.
+                        setPreviewTpl({ postId: selected.id, key: t.key });
+                        run(() => setTemplateAction(selected.id, t.key), `Template: ${t.name}`);
+                      }}
                       className={`flex h-16 flex-col overflow-hidden rounded-lg border-2 text-left ${
-                        templateKey === t.key ? "border-accent-brand" : "border-line"
+                        activeTemplate === t.key ? "border-accent-brand" : "border-line"
                       }`}
                       aria-label={`Template ${t.name}`}
                     >
@@ -537,6 +547,7 @@ function PhonePreview({
   index,
   onSelect,
   version,
+  template,
   story,
   handle,
 }: {
@@ -545,6 +556,7 @@ function PhonePreview({
   index: number;
   onSelect: (i: number) => void;
   version: string;
+  template?: string;
   story: boolean;
   handle: string;
 }) {
@@ -558,6 +570,7 @@ function PhonePreview({
             index={index}
             onSelect={onSelect}
             version={version}
+            template={template}
             handle={handle}
           />
         ) : (
@@ -567,6 +580,7 @@ function PhonePreview({
             index={index}
             onSelect={onSelect}
             version={version}
+            template={template}
             handle={handle}
           />
         )}
@@ -589,6 +603,7 @@ function FeedScreen({
   index,
   onSelect,
   version,
+  template,
   handle,
 }: {
   post: PostRow;
@@ -596,6 +611,7 @@ function FeedScreen({
   index: number;
   onSelect: (i: number) => void;
   version: string;
+  template?: string;
   handle: string;
 }) {
   const multi = slides.length > 1;
@@ -612,7 +628,7 @@ function FeedScreen({
         {slides.length > 0 && (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
-            src={renderUrl(post.id, index, version)}
+            src={renderUrl(post.id, index, version, template)}
             alt={slides[index]?.title ?? "slide"}
             className="h-full w-full object-cover"
           />
@@ -677,6 +693,7 @@ function StoryScreen({
   index,
   onSelect,
   version,
+  template,
   handle,
 }: {
   post: PostRow;
@@ -684,6 +701,7 @@ function StoryScreen({
   index: number;
   onSelect: (i: number) => void;
   version: string;
+  template?: string;
   handle: string;
 }) {
   return (
@@ -691,7 +709,7 @@ function StoryScreen({
       {slides.length > 0 && (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
-          src={renderUrl(post.id, index, version)}
+          src={renderUrl(post.id, index, version, template)}
           alt={slides[index]?.title ?? "tela"}
           className="absolute inset-0 h-full w-full object-cover"
         />

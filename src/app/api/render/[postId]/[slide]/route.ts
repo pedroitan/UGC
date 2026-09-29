@@ -6,7 +6,7 @@ import {
   getPost,
   listKeywords,
 } from "@/lib/db";
-import { renderSlide, svgToPng } from "@/lib/render";
+import { renderSlide, svgToPng, getTemplate } from "@/lib/render";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,14 +36,19 @@ export async function GET(
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
 
+  const url = new URL(request.url);
+  // ?t=<key> = preview de template antes de salvar (seletor do Estúdio).
+  const t = url.searchParams.get("t");
+  const templateOverride = t && getTemplate(t).key === t ? t : undefined;
+
   const [kit, keywords] = await Promise.all([
     getBrandKit(workspace.id),
     listKeywords(workspace.id),
   ]);
-  const rendered = await renderSlide(post, index, kit, keywords);
+  const rendered = await renderSlide(post, index, kit, keywords, templateOverride);
   if (!rendered) return NextResponse.json({ error: "no slide" }, { status: 404 });
 
-  const wantsPng = new URL(request.url).searchParams.get("format") === "png";
+  const wantsPng = url.searchParams.get("format") === "png";
   if (wantsPng) {
     return new Response(new Uint8Array(svgToPng(rendered.svg, rendered.width)), {
       headers: {

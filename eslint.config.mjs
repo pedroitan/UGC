@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Skills de agente (ex.: impeccable) trazem scripts de terceiros.
+    ".devin/skills/**",
   ]),
 ]);
 

@@ -930,6 +930,125 @@ function Expo(slide: SlideInput, size: { width: number; height: number }): React
   );
 }
 
+// --- Template 8: Citação (pull-quote: aspas gigante accent + fala em itálico) --
+
+function Citacao(slide: SlideInput, size: { width: number; height: number }): ReactNode {
+  const tall = size.height > size.width * 1.5;
+  const pad = tall ? 88 : 72;
+  const photoH = slide.image ? Math.round(size.height * (tall ? 0.3 : 0.26)) : 0;
+  return (
+    <div
+      style={{
+        width: size.width,
+        height: size.height,
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: TOKENS.paper,
+        color: TOKENS.ink,
+        padding: pad,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontFamily: M,
+          fontSize: 24,
+          fontWeight: 700,
+          letterSpacing: 5,
+          textTransform: "uppercase",
+          color: TOKENS.accentStrong,
+        }}
+      >
+        <span>{slide.eyebrow}</span>
+        <span style={{ color: TOKENS.muted }}>
+          {slide.n}/{slide.total}
+        </span>
+      </div>
+      {/* Aspas gigante: glifo tipográfico real, não ícone — ancora o slide */}
+      <span
+        style={{
+          fontFamily: F,
+          fontSize: tall ? 380 : 300,
+          fontWeight: 700,
+          color: slide.accent,
+          lineHeight: 0.75,
+          marginTop: tall ? 96 : 72,
+          marginLeft: -16,
+        }}
+      >
+        “
+      </span>
+      <span
+        style={{
+          fontFamily: F,
+          fontStyle: "italic",
+          fontWeight: 500,
+          fontSize: tall ? 92 : 72,
+          lineHeight: 1.16,
+          letterSpacing: -1,
+          marginTop: tall ? -60 : -44,
+        }}
+      >
+        {slide.title}
+      </span>
+      {slide.body && (
+        <span
+          style={{
+            fontFamily: M,
+            fontSize: tall ? 40 : 32,
+            lineHeight: 1.5,
+            color: TOKENS.muted,
+            marginTop: tall ? 56 : 40,
+          }}
+        >
+          {slide.body}
+        </span>
+      )}
+      {slide.image && (
+        <div
+          style={{
+            display: "flex",
+            height: photoH,
+            marginTop: tall ? 64 : 44,
+            border: `3px solid ${TOKENS.ink}`,
+            overflow: "hidden",
+          }}
+        >
+          <CoverImg
+            src={slide.image}
+            w={size.width - pad * 2 - 6}
+            h={photoH - 6}
+          />
+        </div>
+      )}
+      <div
+        style={{
+          marginTop: "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+        }}
+      >
+        <div style={{ display: "flex", height: 2, backgroundColor: TOKENS.ink }} />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontFamily: M,
+            fontSize: 26,
+            fontWeight: 700,
+            color: TOKENS.ink,
+          }}
+        >
+          <span>{slide.handle}</span>
+          {slide.cta && <span style={{ color: slide.accent }}>{slide.cta}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const TEMPLATES: TemplateDef[] = [
   { key: "manchete-escura", name: "Manchete escura", swatch: TOKENS.ink, render: MancheteEscura },
   { key: "papel", name: "Papel", swatch: TOKENS.paper, render: Papel },
@@ -938,6 +1057,7 @@ export const TEMPLATES: TemplateDef[] = [
   { key: "letreiro", name: "Letreiro", swatch: TOKENS.line, render: Letreiro },
   { key: "moderno", name: "Moderno", swatch: "#F5E000", render: Moderno },
   { key: "expo", name: "Expo", swatch: "#4ADE57", render: Expo },
+  { key: "citacao", name: "Citação", swatch: TOKENS.accentStrong, render: Citacao },
 ];
 
 export const DEFAULT_TEMPLATE = "manchete-escura";

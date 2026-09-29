@@ -64,7 +64,7 @@ describe("eyebrowFor", () => {
 
 describe("templates", () => {
   it("tem 7 templates registrados e default válido", () => {
-    expect(TEMPLATES).toHaveLength(7);
+    expect(TEMPLATES).toHaveLength(8);
     expect(TEMPLATES.some((t) => t.key === DEFAULT_TEMPLATE)).toBe(true);
   });
 

@@ -502,6 +502,24 @@ export async function updatePipelineRun(
   if (error) throw new Error(`Erro ao atualizar PipelineRun: ${error.message}`);
 }
 
+export async function findPipelineRunByExternalTaskId(
+  externalTaskId: string,
+): Promise<PipelineRunRow | null> {
+  if (isDevBypass()) {
+    return getDevStore().runs.find((r) => r.external_task_id === externalTaskId) ?? null;
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("pipeline_runs")
+    .select("*")
+    .eq("external_task_id", externalTaskId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`Erro ao buscar PipelineRun: ${error.message}`);
+  return (data as unknown as PipelineRunRow | null) ?? null;
+}
+
 export async function insertPipelineRunReturning(
   values: Omit<PipelineRunRow, "id" | "created_at">,
 ): Promise<PipelineRunRow> {

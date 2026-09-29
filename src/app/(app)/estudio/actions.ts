@@ -10,6 +10,7 @@ import {
   updatePostStatus,
 } from "@/lib/db";
 import { adjustPostScript } from "@/lib/pipeline/generate";
+import { requestPostArt } from "@/lib/pipeline/media";
 import { renderPostAssets } from "@/lib/pipeline/render";
 import { TEMPLATES } from "@/lib/render";
 import { getSlides } from "@/lib/render";
@@ -112,6 +113,12 @@ export async function adjustWithAIAction(postId: string, instruction: string) {
   const parsed = instructionSchema.safeParse(instruction);
   if (!parsed.success) throw new Error("Instrução inválida");
   await adjustPostScript(post.id, parsed.data);
+  revalidatePath("/estudio");
+}
+
+export async function generateArtAction(postId: string) {
+  const post = await requireOwnedPost(postId);
+  await requestPostArt(post.id);
   revalidatePath("/estudio");
 }
 

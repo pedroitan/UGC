@@ -11,6 +11,7 @@ import {
   adjustWithAIAction,
   approvePostAction,
   discardPostAction,
+  generateArtAction,
   moveSlideAction,
   renderAssetsAction,
   setTemplateAction,
@@ -310,6 +311,21 @@ export function EstudioClient({
                   matéria automaticamente.
                 </div>
               )}
+
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() =>
+                  run(
+                    () => generateArtAction(selected.id),
+                    "Arte em geração — em ~1 min a imagem aparece nos slides (clique Atualizar).",
+                  )
+                }
+                className="flex items-center gap-2.5 rounded-lg border border-dashed border-line px-3.5 py-2.5 text-left text-[13px] font-semibold text-muted-foreground transition-colors hover:border-accent-brand hover:text-foreground disabled:opacity-50"
+              >
+                <SparklesIcon />
+                Gerar arte com IA (fundo dos slides)
+              </button>
 
               <div className="flex flex-col gap-2">
                 <span className="text-[13px] font-bold">Template</span>
@@ -796,6 +812,15 @@ function BookmarkIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M6 3h12v18l-6-4.2L6 21V3z" />
+    </svg>
+  );
+}
+
+function SparklesIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" />
+      <path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" />
     </svg>
   );
 }

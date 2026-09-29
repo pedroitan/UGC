@@ -2,6 +2,7 @@ import "server-only";
 
 import { serverEnv } from "@/lib/env";
 import { AnthropicLLMProvider } from "./llm/anthropic";
+import { KieMediaProvider } from "./media/kie";
 import {
   MockChannelAdapter,
   MockLLMProvider,
@@ -36,7 +37,15 @@ export function getLLMProvider(): LLMProvider {
 }
 
 export function getMediaProvider(): MediaProvider {
-  // Kie/Higgsfield reais entram em F2/F4 (webhook assíncrono).
+  const env = serverEnv();
+  if (env.MEDIA_PROVIDER === "kie" && env.KIE_API_KEY) {
+    return new KieMediaProvider(env.KIE_API_KEY, {
+      imageModel: env.KIE_IMAGE_MODEL,
+      videoModel: env.KIE_VIDEO_MODEL,
+      audioModel: env.KIE_AUDIO_MODEL,
+      hmacKey: env.KIE_WEBHOOK_HMAC_KEY,
+    });
+  }
   return new MockMediaProvider();
 }
 

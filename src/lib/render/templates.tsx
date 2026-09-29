@@ -387,11 +387,133 @@ function Foto(slide: SlideInput, size: { width: number; height: number }): React
   );
 }
 
+// --- Template 5: Letreiro (caixas com borda, texto repetido — ref. zine/street) ---
+
+function Letreiro(slide: SlideInput, size: { width: number; height: number }): ReactNode {
+  const tall = size.height > size.width;
+  const pad = tall ? 88 : 64;
+  const box: CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: `3px solid ${TOKENS.paper}`,
+    color: TOKENS.paper,
+    fontFamily: M,
+    fontWeight: 800,
+    letterSpacing: 6,
+  };
+  return (
+    <div
+      style={{
+        width: size.width,
+        height: size.height,
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: TOKENS.ink,
+        padding: pad,
+        gap: 0,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontFamily: M,
+          fontSize: 24,
+          fontWeight: 700,
+          letterSpacing: 4,
+          color: TOKENS.inkSoft,
+          marginBottom: 32,
+        }}
+      >
+        <span
+          style={{ width: 18, height: 18, backgroundColor: slide.accent, marginTop: 4 }}
+        />
+        <span>
+          {slide.n}/{slide.total}
+        </span>
+      </div>
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          style={{
+            ...box,
+            fontSize: tall ? 64 : 52,
+            padding: tall ? "30px 24px" : "22px 24px",
+            marginTop: i === 0 ? 0 : -3,
+            color: i === 1 ? slide.accent : TOKENS.paper,
+          }}
+        >
+          {slide.eyebrow}
+        </div>
+      ))}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          marginTop: "auto",
+          marginBottom: "auto",
+          paddingTop: tall ? 80 : 56,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignSelf: "flex-start",
+            border: `3px solid ${TOKENS.paper}`,
+            padding: tall ? "40px 48px" : "32px 40px",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: F,
+              fontSize: tall ? 96 : 76,
+              fontWeight: 600,
+              lineHeight: 1.06,
+              color: TOKENS.paper,
+            }}
+          >
+            {slide.title}
+          </span>
+        </div>
+        {slide.body && (
+          <span
+            style={{
+              fontFamily: M,
+              fontSize: tall ? 40 : 32,
+              lineHeight: 1.5,
+              color: TOKENS.line,
+              marginTop: 40,
+            }}
+          >
+            {slide.body}
+          </span>
+        )}
+      </div>
+      <div
+        style={{
+          ...box,
+          fontSize: 26,
+          fontWeight: 700,
+          letterSpacing: 4,
+          padding: "20px 32px",
+          justifyContent: "space-between",
+        }}
+      >
+        <span>«</span>
+        <span>{slide.handle}</span>
+        <span>»</span>
+      </div>
+    </div>
+  );
+}
+
 export const TEMPLATES: TemplateDef[] = [
   { key: "manchete-escura", name: "Manchete escura", swatch: TOKENS.ink, render: MancheteEscura },
   { key: "papel", name: "Papel", swatch: TOKENS.paper, render: Papel },
   { key: "destaque", name: "Destaque", swatch: TOKENS.accent, render: Destaque },
   { key: "foto", name: "Foto", swatch: TOKENS.muted, render: Foto },
+  { key: "letreiro", name: "Letreiro", swatch: TOKENS.line, render: Letreiro },
 ];
 
 export const DEFAULT_TEMPLATE = "manchete-escura";

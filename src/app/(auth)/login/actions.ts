@@ -52,12 +52,13 @@ export async function signUpWithPassword(
 
   const origin = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_APP_URL;
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     ...parsed.data,
     options: { emailRedirectTo: `${origin}/auth/callback` },
   });
   if (error) return { error: m.auth.genericError };
 
+  if (data.session) redirect("/");
   return { message: m.auth.checkEmail };
 }
 

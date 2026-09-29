@@ -23,11 +23,12 @@ const FILES: {
   { family: "Manrope", file: "@fontsource/manrope/files/manrope-latin-800-normal.woff", weight: 800 },
 ];
 
-let cached: SatoriOptions["fonts"] | null = null;
+// Promise única em nível de módulo: as fontes são lidas uma vez por instância
+// e compartilhadas por todos os usuários/requests que caírem nela.
+let cached: Promise<SatoriOptions["fonts"]> | null = null;
 
-export async function loadFonts(): Promise<SatoriOptions["fonts"]> {
-  if (cached) return cached;
-  cached = await Promise.all(
+export function loadFonts(): Promise<SatoriOptions["fonts"]> {
+  cached ??= Promise.all(
     FILES.map(async ({ family, file, weight, style }) => ({
       name: family,
       data: await readFile(path.join(process.cwd(), "node_modules", file)),

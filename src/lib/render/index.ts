@@ -23,6 +23,11 @@ export {
   resolveHandle,
 } from "./templates";
 
+// Pré-carrega as fontes já na inicialização do módulo (cold start da lambda):
+// a leitura dos woff roda em paralelo com auth/consultas do primeiro request,
+// e fica pronta para todos os usuários seguintes.
+void loadFonts().catch(() => undefined);
+
 export interface SlideContent {
   title: string;
   body: string;

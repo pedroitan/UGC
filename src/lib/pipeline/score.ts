@@ -10,10 +10,18 @@ export interface ScoreInput {
   authority?: number;
   /** Nº de fontes/fontes do cluster que cobrem a mesma notícia. */
   sourceCount?: number;
+  /** true quando a pauta tem foto da matéria — postável sem geração de arte. */
+  hasImage?: boolean;
   now?: Date;
 }
 
-const WEIGHTS = { relevance: 0.45, freshness: 0.25, authority: 0.15, engagement: 0.15 };
+const WEIGHTS = {
+  relevance: 0.4,
+  freshness: 0.25,
+  authority: 0.12,
+  engagement: 0.13,
+  media: 0.1,
+};
 
 /** Decaimento exponencial: ~1h ≈ 0.92, 24h ≈ 0.37, 72h ≈ 0.05. */
 export function freshness(publishedAt: string | null | undefined, now = new Date()): number {
@@ -35,7 +43,8 @@ export function scorePauta(input: ScoreInput): number {
     (WEIGHTS.relevance * clamp01(input.relevance) +
       WEIGHTS.freshness * freshness(input.publishedAt, input.now) +
       WEIGHTS.authority * clamp01(input.authority ?? 0.6) +
-      WEIGHTS.engagement * engagement(input.sourceCount ?? 1));
+      WEIGHTS.engagement * engagement(input.sourceCount ?? 1) +
+      WEIGHTS.media * (input.hasImage ? 1 : 0));
   return Math.round(Math.min(100, Math.max(0, score)));
 }
 

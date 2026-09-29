@@ -175,6 +175,7 @@ export async function runResearch(workspaceId: string): Promise<ResearchResult> 
         relevance: keywordRelevance(text, includeWeighted),
         publishedAt: rep.publishedAt ?? oldest ?? null,
         sourceCount: cluster.items.length,
+        hasImage: cluster.items.some((i) => i.imageUrl),
       }),
       status: "new",
       embedding: null,

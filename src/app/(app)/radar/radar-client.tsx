@@ -241,7 +241,13 @@ function TimeAgo({ iso }: { iso: string }) {
 
 function PautaThumb({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
-  if (failed) return null;
+  if (failed) {
+    return (
+      <div className="flex h-full w-full items-center justify-center rounded-lg bg-[#EFEAE1] text-muted-foreground">
+        <Search className="h-5 w-5" />
+      </div>
+    );
+  }
   return (
     // eslint-disable-next-line @next/next/no-img-element -- URL externa arbitraria
     <img
@@ -249,7 +255,7 @@ function PautaThumb({ src, alt }: { src: string; alt: string }) {
       alt={alt}
       loading="lazy"
       onError={() => setFailed(true)}
-      className="h-24 w-24 shrink-0 rounded-lg border border-line object-cover"
+      className="h-full w-full rounded-lg border border-line object-cover"
     />
   );
 }
@@ -270,25 +276,31 @@ function PautaCard({
   const image = pauta.citations.find((c) => c.image_url)?.image_url;
 
   return (
-    <article className="flex items-center gap-5 rounded-[14px] border border-line bg-surface px-5 py-4">
-      <div className="flex w-16 shrink-0 flex-col items-center gap-1.5">
+    <article className="flex gap-5 rounded-[14px] border border-line bg-surface p-5">
+      {/* Mídia + score: foto grande quando existe, bloco neutro sem ela */}
+      <div className="relative h-[140px] w-[140px] shrink-0 self-center">
+        {image ? (
+          <PautaThumb src={image} alt={pauta.title} />
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-lg bg-[#EFEAE1]">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              sem foto
+            </span>
+          </div>
+        )}
         <span
-          className={`font-heading text-3xl font-bold ${hot ? "text-accent-strong" : "text-[#3D382F]"}`}
+          className={`absolute -bottom-2 left-2 rounded-md px-2 py-0.5 font-heading text-sm font-bold text-white shadow-sm ${
+            hot ? "bg-accent-strong" : "bg-[#3D382F]"
+          }`}
         >
           {score}
         </span>
-        <div className="h-[5px] w-14 rounded-[3px] bg-[#EFEAE1]">
-          <div
-            className="h-[5px] rounded-[3px]"
-            style={{ width: `${score}%`, background: hot ? "#9E3113" : "#3D382F" }}
-          />
-        </div>
       </div>
-      {image && <PautaThumb src={image} alt={pauta.title} />}
-      <div className="flex min-w-0 grow flex-col gap-1">
+
+      <div className="flex min-w-0 grow flex-col gap-1.5">
         <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
           {hot && <Badge className="bg-carousel-bg text-carousel-fg">QUENTE</Badge>}
-          <span>
+          <span className="truncate">
             {pauta.citations[0]?.source_name ?? "web"} ·{" "}
             {pauta.published_at ? <TimeAgo iso={pauta.published_at} /> : "sem data"} ·{" "}
             {pauta.source_urls.length} fonte(s)
@@ -296,30 +308,31 @@ function PautaCard({
         </div>
         <h2 className="text-[17px] font-bold leading-snug">{pauta.title}</h2>
         {pauta.summary && (
-          <p className="text-sm leading-relaxed text-[#3D382F]">{pauta.summary}</p>
+          <p className="line-clamp-2 text-sm leading-relaxed text-[#3D382F]">{pauta.summary}</p>
         )}
-      </div>
-      <div className="flex shrink-0 flex-col items-end gap-2">
-        <div className="flex gap-1.5">
-          {FORMATS.map((f) => (
-            <Button
-              key={f.id}
-              size="sm"
-              variant={f.id === "carousel" ? "default" : "outline"}
-              disabled={generating !== null}
-              onClick={() => onGenerate(pauta.id, f.id)}
-            >
-              {generating === `${pauta.id}:${f.id}` ? "Gerando…" : f.label}
-            </Button>
-          ))}
+
+        <div className="mt-auto flex items-center justify-between gap-3 pt-2">
+          <div className="flex gap-1.5">
+            {FORMATS.map((f) => (
+              <Button
+                key={f.id}
+                size="sm"
+                variant={f.id === "carousel" ? "default" : "outline"}
+                disabled={generating !== null}
+                onClick={() => onGenerate(pauta.id, f.id)}
+              >
+                {generating === `${pauta.id}:${f.id}` ? "Gerando…" : f.label}
+              </Button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="shrink-0 text-[13px] text-muted-foreground hover:text-foreground"
+          >
+            Descartar pauta
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onDismiss}
-          className="text-[13px] text-muted-foreground hover:text-foreground"
-        >
-          Descartar pauta
-        </button>
       </div>
     </article>
   );

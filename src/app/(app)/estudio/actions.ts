@@ -79,6 +79,15 @@ export async function setTemplateAction(postId: string, templateKey: string) {
   revalidatePath("/estudio");
 }
 
+export async function toggleSourceImageAction(postId: string, use: boolean) {
+  const post = await requireOwnedPost(postId);
+  const script = post.script as Record<string, unknown>;
+  const meta = (script._meta ?? {}) as Record<string, unknown>;
+  if (!meta.image) return;
+  await updatePostScript(postId, { ...script, _meta: { ...meta, useImage: use } });
+  revalidatePath("/estudio");
+}
+
 const contentSchema = z.object({
   caption: z.string().max(2200).optional(),
   hashtags: z.array(z.string().max(50)).max(30).optional(),

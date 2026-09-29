@@ -63,6 +63,7 @@ export function buildSlideInput(
   const slides = getSlides(post);
   const s = slides[index];
   if (!s) return null;
+  const meta = post.script as { _meta?: { image?: string; useImage?: boolean } };
   return {
     n: index + 1,
     total: slides.length,
@@ -72,7 +73,7 @@ export function buildSlideInput(
     cta: s.cta,
     handle: resolveHandle(kit),
     accent: accentColor(kit),
-    image: (post.script as { _meta?: { image?: string } })._meta?.image,
+    image: meta._meta?.useImage === false ? undefined : meta._meta?.image,
   };
 }
 

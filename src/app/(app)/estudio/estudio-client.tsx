@@ -14,6 +14,7 @@ import {
   moveSlideAction,
   renderAssetsAction,
   setTemplateAction,
+  toggleSourceImageAction,
   updateContentAction,
   updateSlideAction,
 } from "./actions";
@@ -79,9 +80,14 @@ export function EstudioClient({
   const index = Math.min(sel, Math.max(0, slides.length - 1));
   const slide = slides[index];
   const isStoryLike = selected?.format === "story" || selected?.format === "reel";
-  const meta = (selected?.script as { _meta?: { similarity?: number; provider?: string } })
-    ?._meta;
+  const meta = (
+    selected?.script as {
+      _meta?: { similarity?: number; provider?: string; image?: string; useImage?: boolean };
+    }
+  )?._meta;
   const similarityPct = Math.round((meta?.similarity ?? 0) * 100);
+  const sourceImage = meta?.image;
+  const useImage = Boolean(sourceImage) && meta?.useImage !== false;
   const version = selected?.updated_at ?? "0";
 
   function run(fn: () => Promise<unknown>, ok: string) {
@@ -256,6 +262,28 @@ export function EstudioClient({
                 <strong>Checagem de fatos:</strong> similaridade com as fontes:{" "}
                 {similarityPct}% (limite 30%) · provedor: {meta?.provider ?? "—"}
               </div>
+
+              {sourceImage && (
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() =>
+                    run(
+                      () => toggleSourceImageAction(selected.id, !useImage),
+                      useImage ? "Foto removida." : "Foto aplicada.",
+                    )
+                  }
+                  className={`flex items-center gap-2.5 rounded-lg border px-3.5 py-2.5 text-left text-[13px] font-semibold transition-colors ${
+                    useImage
+                      ? "border-accent-brand bg-accent-brand/5 text-foreground"
+                      : "border-line text-muted-foreground"
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- URL externa */}
+                  <img src={sourceImage} alt="" className="h-9 w-9 rounded object-cover" />
+                  {useImage ? "Foto da fonte ativa — clique para remover" : "Usar foto da fonte nos slides"}
+                </button>
+              )}
 
               <div className="flex flex-col gap-2">
                 <span className="text-[13px] font-bold">Template</span>

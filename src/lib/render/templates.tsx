@@ -69,10 +69,29 @@ function MancheteEscura(slide: SlideInput, size: { width: number; height: number
         display: "flex",
         flexDirection: "column",
         backgroundColor: TOKENS.ink,
+        ...(slide.image
+          ? {
+              backgroundImage: `url(${slide.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : {}),
         color: "#FFFFFF",
-        padding: pad,
       }}
     >
+      {slide.image && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(23,21,15,0.82)",
+          }}
+        />
+      )}
+      <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, padding: pad }}>
       <div
         style={{
           display: "flex",
@@ -138,6 +157,7 @@ function MancheteEscura(slide: SlideInput, size: { width: number; height: number
         <span>{slide.handle}</span>
         {slide.total > 1 && slide.n < slide.total && <span>Arraste »</span>}
       </div>
+      </div>
     </div>
   );
 }
@@ -177,13 +197,26 @@ function Papel(slide: SlideInput, size: { width: number; height: number }): Reac
           {slide.n}/{slide.total}
         </span>
       </div>
+      {slide.image && (
+        <div
+          style={{
+            display: "flex",
+            height: Math.round(size.height * 0.38),
+            marginTop: tall ? 56 : 40,
+            border: `3px solid ${TOKENS.ink}`,
+            backgroundImage: `url(${slide.image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+      )}
       <span
         style={{
           fontFamily: F,
           fontSize: tall ? 96 : 78,
           fontWeight: 700,
           lineHeight: 1.06,
-          marginTop: tall ? 80 : 56,
+          marginTop: slide.image ? 48 : tall ? 80 : 56,
         }}
       >
         {slide.title}
@@ -236,10 +269,29 @@ function Destaque(slide: SlideInput, size: { width: number; height: number }): R
         display: "flex",
         flexDirection: "column",
         backgroundColor: slide.accent,
+        ...(slide.image
+          ? {
+              backgroundImage: `url(${slide.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : {}),
         color: TOKENS.ink,
-        padding: pad,
       }}
     >
+      {slide.image && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: `${slide.accent}E0`,
+          }}
+        />
+      )}
+      <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, padding: pad }}>
       <span
         style={{
           fontFamily: M,
@@ -293,6 +345,7 @@ function Destaque(slide: SlideInput, size: { width: number; height: number }): R
         <span style={{ fontFamily: M, fontSize: 26, fontWeight: 600, textAlign: "center" }}>
           {slide.handle}
         </span>
+      </div>
       </div>
     </div>
   );
@@ -453,6 +506,19 @@ function Letreiro(slide: SlideInput, size: { width: number; height: number }): R
           {slide.eyebrow}
         </div>
       ))}
+      {slide.image && (
+        <div
+          style={{
+            display: "flex",
+            height: Math.round(size.height * 0.3),
+            marginTop: tall ? 56 : 40,
+            border: `3px solid ${TOKENS.paper}`,
+            backgroundImage: `url(${slide.image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+      )}
       <div
         style={{
           display: "flex",

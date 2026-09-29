@@ -276,7 +276,7 @@ export function EstudioClient({
                 {similarityPct}% (limite 30%) · provedor: {meta?.provider ?? "—"}
               </div>
 
-              {sourceImage && (
+              {sourceImage ? (
                 <button
                   type="button"
                   disabled={pending}
@@ -296,6 +296,11 @@ export function EstudioClient({
                   <img src={sourceImage} alt="" className="h-9 w-9 rounded object-cover" />
                   {useImage ? "Foto da fonte ativa — clique para remover" : "Usar foto da fonte nos slides"}
                 </button>
+              ) : (
+                <div className="rounded-lg border border-dashed border-line px-3.5 py-2.5 text-[12px] text-muted-foreground">
+                  Sem foto da fonte neste post — pautas novas trazem a imagem da
+                  matéria automaticamente.
+                </div>
               )}
 
               <div className="flex flex-col gap-2">

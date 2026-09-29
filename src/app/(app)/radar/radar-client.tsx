@@ -239,6 +239,21 @@ function TimeAgo({ iso }: { iso: string }) {
   return <>{label}</>;
 }
 
+function PautaThumb({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- URL externa arbitraria
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className="h-24 w-24 shrink-0 rounded-lg border border-line object-cover"
+    />
+  );
+}
+
 function PautaCard({
   pauta,
   generating,
@@ -252,6 +267,7 @@ function PautaCard({
 }) {
   const score = pauta.score ?? 0;
   const hot = score >= 80;
+  const image = pauta.citations.find((c) => c.image_url)?.image_url;
 
   return (
     <article className="flex items-center gap-5 rounded-[14px] border border-line bg-surface px-5 py-4">
@@ -268,6 +284,7 @@ function PautaCard({
           />
         </div>
       </div>
+      {image && <PautaThumb src={image} alt={pauta.title} />}
       <div className="flex min-w-0 grow flex-col gap-1">
         <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
           {hot && <Badge className="bg-carousel-bg text-carousel-fg">QUENTE</Badge>}

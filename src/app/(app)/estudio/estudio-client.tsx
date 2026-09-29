@@ -259,7 +259,7 @@ export function EstudioClient({
 
               <div className="flex flex-col gap-2">
                 <span className="text-[13px] font-bold">Template</span>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {templates.map((t) => (
                     <button
                       key={t.key}
@@ -269,12 +269,16 @@ export function EstudioClient({
                       onClick={() =>
                         run(() => setTemplateAction(selected.id, t.key), `Template: ${t.name}`)
                       }
-                      className={`h-14 rounded-lg border-2 ${
+                      className={`flex h-16 flex-col overflow-hidden rounded-lg border-2 text-left ${
                         templateKey === t.key ? "border-accent-brand" : "border-line"
                       }`}
-                      style={{ background: t.swatch }}
                       aria-label={`Template ${t.name}`}
-                    />
+                    >
+                      <span className="min-h-0 grow" style={{ background: t.swatch }} />
+                      <span className="w-full truncate bg-surface px-1.5 py-0.5 text-[10px] font-semibold">
+                        {t.name}
+                      </span>
+                    </button>
                   ))}
                 </div>
               </div>

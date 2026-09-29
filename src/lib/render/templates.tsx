@@ -514,12 +514,172 @@ function Letreiro(slide: SlideInput, size: { width: number; height: number }): R
   );
 }
 
+// --- Template 6: Moderno (bloco accent + ink, texto vertical, pontos) -----------
+
+function VerticalText({ text, color, size }: { text: string; color: string; size: number }) {
+  const chars = text.replace(/[^A-ZÀ-Ú0-9 ]/gi, "").toUpperCase().slice(0, 14).split("");
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        fontFamily: M,
+        fontSize: size,
+        fontWeight: 800,
+        letterSpacing: 2,
+        color,
+        lineHeight: 1.15,
+      }}
+    >
+      {chars.map((c, i) => (
+        <span key={i}>{c === " " ? " " : c}</span>
+      ))}
+    </div>
+  );
+}
+
+function Dots({ color }: { color: string }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {[0, 1, 2].map((row) => (
+        <div key={row} style={{ display: "flex", gap: 8 }}>
+          {[0, 1, 2].map((col) => (
+            <div
+              key={col}
+              style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color }}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Moderno(slide: SlideInput, size: { width: number; height: number }): ReactNode {
+  const tall = size.height > size.width;
+  const pad = tall ? 80 : 60;
+  const stripW = tall ? 110 : 90;
+  const innerW = size.width - stripW;
+  return (
+    <div
+      style={{
+        width: size.width,
+        height: size.height,
+        display: "flex",
+        backgroundColor: slide.accent,
+        color: TOKENS.ink,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: stripW,
+          borderRight: `3px solid ${TOKENS.ink}`,
+        }}
+      >
+        <VerticalText text={slide.eyebrow || "PAUTA"} color={TOKENS.ink} size={tall ? 34 : 28} />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: innerW,
+          padding: pad,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontFamily: M,
+            fontSize: 24,
+            fontWeight: 800,
+            letterSpacing: 4,
+          }}
+        >
+          <span style={{ border: `2px solid ${TOKENS.ink}`, padding: "8px 14px" }}>
+            {String(slide.n).padStart(2, "0")}
+          </span>
+          <span>
+            {slide.n}/{slide.total}
+          </span>
+        </div>
+        <span
+          style={{
+            fontFamily: M,
+            fontSize: tall ? 92 : 74,
+            fontWeight: 800,
+            lineHeight: 1.02,
+            letterSpacing: -1,
+            textTransform: "uppercase",
+            marginTop: tall ? 72 : 48,
+          }}
+        >
+          {slide.title}
+        </span>
+        {slide.body && (
+          <span
+            style={{
+              display: "flex",
+              fontFamily: M,
+              fontSize: tall ? 36 : 30,
+              fontWeight: 500,
+              lineHeight: 1.45,
+              marginTop: 36,
+              backgroundColor: TOKENS.paper,
+              padding: "24px 28px",
+            }}
+          >
+            {slide.body}
+          </span>
+        )}
+        {slide.image && (
+          <div
+            style={{
+              display: "flex",
+              height: tall ? 420 : 320,
+              marginTop: 40,
+              border: `4px solid ${TOKENS.ink}`,
+              backgroundImage: `url(${slide.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+        )}
+        <div
+          style={{
+            marginTop: "auto",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: TOKENS.ink,
+            color: TOKENS.paper,
+            padding: "22px 28px",
+            fontFamily: M,
+            fontSize: 26,
+            fontWeight: 700,
+            letterSpacing: 3,
+          }}
+        >
+          <span>{slide.handle}</span>
+          <Dots color={slide.accent} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const TEMPLATES: TemplateDef[] = [
   { key: "manchete-escura", name: "Manchete escura", swatch: TOKENS.ink, render: MancheteEscura },
   { key: "papel", name: "Papel", swatch: TOKENS.paper, render: Papel },
   { key: "destaque", name: "Destaque", swatch: TOKENS.accent, render: Destaque },
   { key: "foto", name: "Foto", swatch: TOKENS.muted, render: Foto },
   { key: "letreiro", name: "Letreiro", swatch: TOKENS.line, render: Letreiro },
+  { key: "moderno", name: "Moderno", swatch: "#F5E000", render: Moderno },
 ];
 
 export const DEFAULT_TEMPLATE = "manchete-escura";

@@ -5,7 +5,7 @@ import { getTemplate, SLIDE_SIZES } from "../src/lib/render/templates";
 import { loadFonts } from "../src/lib/render/fonts";
 import { svgToPng } from "../src/lib/render";
 
-describe("letreiro preview", () => {
+describe("moderno preview", () => {
   it("gera PNG de exemplo", async () => {
     const fonts = await loadFonts();
     const slide = {
@@ -17,10 +17,10 @@ describe("letreiro preview", () => {
       handle: "@pauta",
       accent: "#E4572E",
     };
-    const tpl = getTemplate("letreiro");
+    const tpl = getTemplate("moderno");
     for (const [name, size] of [["feed", SLIDE_SIZES.carousel], ["story", SLIDE_SIZES.story]] as const) {
       const svg = await satori(tpl.render(slide, size), { ...size, fonts });
-      writeFileSync(`/tmp/letreiro-${name}.png`, svgToPng(svg, size.width));
+      writeFileSync(`/tmp/moderno-${name}.png`, svgToPng(svg, size.width));
     }
     expect(true).toBe(true);
   });

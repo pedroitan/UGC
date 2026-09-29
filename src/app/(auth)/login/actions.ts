@@ -13,6 +13,16 @@ const credentialsSchema = z.object({
 
 export type AuthFormState = { error?: string; message?: string } | null;
 
+/** Único action do form: o botão clicado define a intenção (name="intent"). */
+export async function authAction(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  return formData.get("intent") === "signup"
+    ? signUpWithPassword(_prev, formData)
+    : signInWithPassword(_prev, formData);
+}
+
 export async function signInWithPassword(
   _prev: AuthFormState,
   formData: FormData,

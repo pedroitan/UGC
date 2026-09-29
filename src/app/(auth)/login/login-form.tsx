@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { m } from "@/lib/messages";
-import { signInWithGoogle, signInWithPassword, signUpWithPassword } from "./actions";
+import { authAction, signInWithGoogle } from "./actions";
 
 export function LoginForm() {
-  const [state, formAction, pending] = useActionState(signInWithPassword, null);
+  const [state, formAction, pending] = useActionState(authAction, null);
 
   return (
     <div className="flex flex-col gap-4">
@@ -39,10 +39,25 @@ export function LoginForm() {
             {state.message}
           </p>
         )}
-        <Button type="submit" className="h-11" disabled={pending}>
+        <Button
+          type="submit"
+          name="intent"
+          value="signin"
+          className="h-11"
+          disabled={pending}
+        >
           {m.auth.signIn}
         </Button>
-        <SignUpButton />
+        <Button
+          type="submit"
+          name="intent"
+          value="signup"
+          variant="outline"
+          className="h-11"
+          disabled={pending}
+        >
+          {m.auth.signUp}
+        </Button>
       </form>
       <Separator />
       <form action={signInWithGoogle}>
@@ -51,14 +66,5 @@ export function LoginForm() {
         </Button>
       </form>
     </div>
-  );
-}
-
-function SignUpButton() {
-  const [state, formAction, pending] = useActionState(signUpWithPassword, null);
-  return (
-    <Button formAction={formAction} variant="outline" className="h-11" disabled={pending}>
-      {state?.error ?? state?.message ?? m.auth.signUp}
-    </Button>
   );
 }

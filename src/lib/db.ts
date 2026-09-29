@@ -224,6 +224,17 @@ export async function toggleSource(id: string, active: boolean): Promise<void> {
   if (error) throw new Error(`Erro ao atualizar fonte: ${error.message}`);
 }
 
+export async function deleteSource(id: string): Promise<void> {
+  if (isDevBypass()) {
+    const store = getDevStore();
+    store.sources = store.sources.filter((x) => x.id !== id);
+    return;
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.from("sources").delete().eq("id", id);
+  if (error) throw new Error(`Erro ao remover fonte: ${error.message}`);
+}
+
 // --- Pautas ------------------------------------------------------------------
 
 export async function listPautas(

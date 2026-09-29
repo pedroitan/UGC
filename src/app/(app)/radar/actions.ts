@@ -6,6 +6,7 @@ import {
   addKeyword,
   addSource,
   deleteKeyword,
+  deleteSource,
   getOrCreateWorkspace,
   toggleSource,
   updatePautaStatus,
@@ -56,6 +57,11 @@ export async function addSourceAction(formData: FormData) {
 
 export async function toggleSourceAction(id: string, active: boolean) {
   await toggleSource(id, active);
+  revalidatePath("/radar");
+}
+
+export async function deleteSourceAction(id: string) {
+  await deleteSource(id);
   revalidatePath("/radar");
 }
 

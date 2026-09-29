@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Plus, Search, X } from "lucide-react";
+import { Plus, Search, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import type { KeywordRow, PautaRow, SourceRow } from "@/types/db";
 import {
   addKeywordAction,
   addSourceAction,
+  deleteSourceAction,
   dismissPautaAction,
   removeKeywordAction,
   toggleSourceAction,
@@ -145,17 +146,40 @@ export function RadarClient({
           <CardHeader>
             <CardTitle className="font-heading text-xl">Fontes ativas</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-2.5">
+          <CardContent className="flex flex-col gap-1">
             {sources.map((s) => (
-              <div key={s.id} className="flex items-center justify-between text-sm">
-                <span className="truncate">{s.name ?? s.url ?? s.type}</span>
+              <div
+                key={s.id}
+                className={`flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors ${
+                  s.active ? "" : "opacity-50"
+                }`}
+              >
                 <button
                   type="button"
+                  role="switch"
+                  aria-checked={s.active}
+                  aria-label={`${s.active ? "Pausar" : "Ativar"} ${s.name ?? s.url ?? s.type}`}
                   disabled={pending}
                   onClick={() => startTransition(() => toggleSourceAction(s.id, !s.active))}
-                  className={s.active ? "font-semibold text-reel-fg" : "text-muted-foreground"}
+                  className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
+                    s.active ? "bg-accent-brand" : "bg-[#D8D2C6]"
+                  }`}
                 >
-                  {s.active ? "ativa" : "pausada"}
+                  <span
+                    className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                      s.active ? "translate-x-4" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+                <span className="min-w-0 grow truncate">{s.name ?? s.url ?? s.type}</span>
+                <button
+                  type="button"
+                  aria-label={`Remover ${s.name ?? s.url ?? s.type}`}
+                  disabled={pending}
+                  onClick={() => startTransition(() => deleteSourceAction(s.id))}
+                  className="shrink-0 text-muted-foreground transition-colors hover:text-accent-strong"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             ))}

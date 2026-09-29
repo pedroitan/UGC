@@ -56,10 +56,41 @@ export function resolveHandle(kit: BrandKitRow | null): string {
   return kit?.handle ? `@${kit.handle.replace(/^@/, "")}` : "@suamarca";
 }
 
+// <img> com crop editorial. O satori ignora backgroundPosition em
+// background-image (ancora tudo no canto superior esquerdo), então a foto
+// vai sempre num <img> com object-fit: cover ancorado em "50% 30%" —
+// terço superior, onde rostos e o assunto costumam estar.
+function CoverImg({
+  src,
+  w,
+  h,
+  absolute = false,
+}: {
+  src: string;
+  w: number;
+  h: number;
+  absolute?: boolean;
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- JSX do Satori, não DOM
+    <img
+      src={src}
+      alt=""
+      width={w}
+      height={h}
+      style={{
+        objectFit: "cover",
+        objectPosition: "50% 30%",
+        ...(absolute ? { position: "absolute" as const, top: 0, left: 0 } : {}),
+      }}
+    />
+  );
+}
+
 // --- Template 1: Manchete escura (fundo ink, número em destaque) --------------
 
 function MancheteEscura(slide: SlideInput, size: { width: number; height: number }): ReactNode {
-  const tall = size.height > size.width;
+  const tall = size.height > size.width * 1.5;
   const pad = tall ? 96 : 72;
   return (
     <div
@@ -69,16 +100,12 @@ function MancheteEscura(slide: SlideInput, size: { width: number; height: number
         display: "flex",
         flexDirection: "column",
         backgroundColor: TOKENS.ink,
-        ...(slide.image
-          ? {
-              backgroundImage: `url(${slide.image})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }
-          : {}),
         color: "#FFFFFF",
       }}
     >
+      {slide.image && (
+        <CoverImg src={slide.image} w={size.width} h={size.height} absolute />
+      )}
       {slide.image && (
         <div
           style={{
@@ -165,7 +192,7 @@ function MancheteEscura(slide: SlideInput, size: { width: number; height: number
 // --- Template 2: Papel (fundo claro, editorial) --------------------------------
 
 function Papel(slide: SlideInput, size: { width: number; height: number }): ReactNode {
-  const tall = size.height > size.width;
+  const tall = size.height > size.width * 1.5;
   const pad = tall ? 96 : 72;
   return (
     <div
@@ -201,21 +228,25 @@ function Papel(slide: SlideInput, size: { width: number; height: number }): Reac
         <div
           style={{
             display: "flex",
-            height: Math.round(size.height * 0.38),
+            height: Math.round(size.height * (tall ? 0.38 : 0.3)),
             marginTop: tall ? 56 : 40,
             border: `3px solid ${TOKENS.ink}`,
-            backgroundImage: `url(${slide.image})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            overflow: "hidden",
           }}
-        />
+        >
+          <CoverImg
+            src={slide.image}
+            w={size.width - pad * 2 - 6}
+            h={Math.round(size.height * (tall ? 0.38 : 0.3)) - 6}
+          />
+        </div>
       )}
       <span
         style={{
           fontFamily: F,
-          fontSize: tall ? 96 : 78,
+          fontSize: slide.image ? (tall ? 96 : 68) : tall ? 96 : 78,
           fontWeight: 700,
-          lineHeight: 1.06,
+          lineHeight: 1.12,
           marginTop: slide.image ? 48 : tall ? 80 : 56,
         }}
       >
@@ -228,7 +259,7 @@ function Papel(slide: SlideInput, size: { width: number; height: number }): Reac
             fontSize: tall ? 42 : 36,
             lineHeight: 1.5,
             color: TOKENS.muted,
-            marginTop: 36,
+            marginTop: 44,
           }}
         >
           {slide.body}
@@ -259,7 +290,7 @@ function Papel(slide: SlideInput, size: { width: number; height: number }): Reac
 // --- Template 3: Destaque (fundo accent, CTA escuro) ----------------------------
 
 function Destaque(slide: SlideInput, size: { width: number; height: number }): ReactNode {
-  const tall = size.height > size.width;
+  const tall = size.height > size.width * 1.5;
   const pad = tall ? 96 : 72;
   return (
     <div
@@ -269,16 +300,12 @@ function Destaque(slide: SlideInput, size: { width: number; height: number }): R
         display: "flex",
         flexDirection: "column",
         backgroundColor: slide.accent,
-        ...(slide.image
-          ? {
-              backgroundImage: `url(${slide.image})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }
-          : {}),
         color: TOKENS.ink,
       }}
     >
+      {slide.image && (
+        <CoverImg src={slide.image} w={size.width} h={size.height} absolute />
+      )}
       {slide.image && (
         <div
           style={{
@@ -354,7 +381,7 @@ function Destaque(slide: SlideInput, size: { width: number; height: number }): R
 // --- Template 4: Foto (mídia em cima, card escuro embaixo) -----------------------
 
 function Foto(slide: SlideInput, size: { width: number; height: number }): ReactNode {
-  const tall = size.height > size.width;
+  const tall = size.height > size.width * 1.5;
   const mediaH = tall ? Math.round(size.height * 0.55) : Math.round(size.height * 0.5);
   const cardStyle: CSSProperties = {
     flexGrow: 1,
@@ -378,15 +405,15 @@ function Foto(slide: SlideInput, size: { width: number; height: number }): React
         style={{
           display: "flex",
           height: mediaH,
-          backgroundImage: slide.image
-            ? `url(${slide.image})`
-            : `linear-gradient(135deg, ${slide.accent} 0%, ${TOKENS.ink} 130%)`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundImage: `linear-gradient(135deg, ${slide.accent} 0%, ${TOKENS.ink} 130%)`,
+          overflow: "hidden",
           alignItems: "flex-end",
           padding: 48,
         }}
       >
+        {slide.image && (
+          <CoverImg src={slide.image} w={size.width} h={mediaH} absolute />
+        )}
         <span
           style={{
             fontFamily: M,
@@ -449,7 +476,7 @@ function Foto(slide: SlideInput, size: { width: number; height: number }): React
 // --- Template 5: Letreiro (caixas com borda, texto repetido — ref. zine/street) ---
 
 function Letreiro(slide: SlideInput, size: { width: number; height: number }): ReactNode {
-  const tall = size.height > size.width;
+  const tall = size.height > size.width * 1.5;
   const pad = tall ? 88 : 64;
   const box: CSSProperties = {
     display: "flex",
@@ -513,11 +540,15 @@ function Letreiro(slide: SlideInput, size: { width: number; height: number }): R
             height: Math.round(size.height * 0.3),
             marginTop: tall ? 56 : 40,
             border: `3px solid ${TOKENS.paper}`,
-            backgroundImage: `url(${slide.image})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            overflow: "hidden",
           }}
-        />
+        >
+          <CoverImg
+            src={slide.image}
+            w={size.width - pad * 2 - 6}
+            h={Math.round(size.height * 0.3) - 6}
+          />
+        </div>
       )}
       <div
         style={{
@@ -623,7 +654,7 @@ function Dots({ color }: { color: string }) {
 }
 
 function Moderno(slide: SlideInput, size: { width: number; height: number }): ReactNode {
-  const tall = size.height > size.width;
+  const tall = size.height > size.width * 1.5;
   const pad = tall ? 80 : 60;
   const stripW = tall ? 110 : 90;
   const innerW = size.width - stripW;
@@ -710,11 +741,15 @@ function Moderno(slide: SlideInput, size: { width: number; height: number }): Re
               height: tall ? 420 : 320,
               marginTop: 40,
               border: `4px solid ${TOKENS.ink}`,
-              backgroundImage: `url(${slide.image})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
+              overflow: "hidden",
             }}
-          />
+          >
+            <CoverImg
+              src={slide.image}
+              w={innerW - pad * 2 - 8}
+              h={(tall ? 420 : 320) - 8}
+            />
+          </div>
         )}
         <div
           style={{
@@ -742,7 +777,7 @@ function Moderno(slide: SlideInput, size: { width: number; height: number }): Re
 // --- Template 7: Expo (cartaz de exposição: papel, fileiras finas, foto) -------
 
 function Expo(slide: SlideInput, size: { width: number; height: number }): ReactNode {
-  const tall = size.height > size.width;
+  const tall = size.height > size.width * 1.5;
   const pad = tall ? 88 : 64;
   const rule = (mt = 0) => (
     <div
@@ -810,11 +845,15 @@ function Expo(slide: SlideInput, size: { width: number; height: number }): React
             flexDirection: "column",
             height: photoH,
             marginTop: tall ? 40 : 32,
-            backgroundImage: `url(${slide.image})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            overflow: "hidden",
           }}
         >
+          <CoverImg
+            src={slide.image}
+            w={size.width - pad * 2}
+            h={photoH}
+            absolute
+          />
           <div
             style={{
               display: "flex",

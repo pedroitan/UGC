@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import satori from "satori";
-import { getTemplate, SLIDE_SIZES } from "../src/lib/render/templates";
+import { TEMPLATES, SLIDE_SIZES } from "../src/lib/render/templates";
 import { loadFonts } from "../src/lib/render/fonts";
 import { svgToPng } from "../src/lib/render";
 
-describe("expo preview", () => {
-  it("gera PNG de exemplo", async () => {
+describe("template previews", () => {
+  it("gera PNG de exemplo de todos os templates (feed + story)", async () => {
     const fonts = await loadFonts();
     // foto fake: PNG colorido embutido como data URI
     const fakePhoto = `data:image/png;base64,${svgToPng(
@@ -23,11 +23,14 @@ describe("expo preview", () => {
       accent: "#3ECF4E",
       image: fakePhoto,
     };
-    const tpl = getTemplate("expo");
-    for (const [name, size] of [["feed", SLIDE_SIZES.carousel], ["story", SLIDE_SIZES.story]] as const) {
-      const svg = await satori(tpl.render(slide, size), { ...size, fonts });
-      writeFileSync(`/tmp/expo-${name}.png`, svgToPng(svg, size.width));
+    const out = "/tmp/pauta-previews";
+    mkdirSync(out, { recursive: true });
+    for (const tpl of TEMPLATES) {
+      for (const [name, size] of [["feed", SLIDE_SIZES.carousel], ["story", SLIDE_SIZES.story]] as const) {
+        const svg = await satori(tpl.render(slide, size), { ...size, fonts });
+        writeFileSync(`${out}/${tpl.key}-${name}.png`, svgToPng(svg, size.width));
+      }
     }
     expect(true).toBe(true);
-  });
+  }, 60_000);
 });

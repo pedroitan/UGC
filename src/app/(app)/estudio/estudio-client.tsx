@@ -88,7 +88,8 @@ export function EstudioClient({
   const similarityPct = Math.round((meta?.similarity ?? 0) * 100);
   const sourceImage = meta?.image;
   const useImage = Boolean(sourceImage) && meta?.useImage !== false;
-  const version = selected?.updated_at ?? "0";
+  const [renderTick, setRenderTick] = useState(0);
+  const version = `${selected?.updated_at ?? "0"}:${renderTick}`;
 
   function run(fn: () => Promise<unknown>, ok: string) {
     startTransition(async () => {
@@ -227,9 +228,21 @@ export function EstudioClient({
                 story={isStoryLike}
                 handle={handle}
               />
-              <span className="text-[12px] text-muted-foreground">
-                Pré-visualização em {FORMAT_SIZE[selected.format]} · Instagram
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[12px] text-muted-foreground">
+                  Pré-visualização em {FORMAT_SIZE[selected.format]} · Instagram
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setRenderTick((t) => t + 1)}
+                  className="h-7 gap-1.5 px-2 text-[12px] text-muted-foreground"
+                  title="Recarregar a pré-visualização"
+                >
+                  <RefreshIcon /> Atualizar
+                </Button>
+              </div>
             </section>
 
             {/* Painel de edição */}
@@ -760,6 +773,15 @@ function BookmarkIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M6 3h12v18l-6-4.2L6 21V3z" />
+    </svg>
+  );
+}
+
+function RefreshIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+      <path d="M21 3v6h-6" />
     </svg>
   );
 }

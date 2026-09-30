@@ -513,6 +513,31 @@ export async function updatePipelineRun(
   if (error) throw new Error(`Erro ao atualizar PipelineRun: ${error.message}`);
 }
 
+export async function findRunningMediaRunByPost(
+  postId: string,
+): Promise<PipelineRunRow | null> {
+  if (isDevBypass()) {
+    return (
+      getDevStore().runs.find(
+        (r) => r.post_id === postId && r.stage === "media" &&
+          (r.status === "running" || r.status === "pending"),
+      ) ?? null
+    );
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("pipeline_runs")
+    .select("*")
+    .eq("post_id", postId)
+    .eq("stage", "media")
+    .in("status", ["running", "pending"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`Erro ao buscar PipelineRun: ${error.message}`);
+  return (data as unknown as PipelineRunRow | null) ?? null;
+}
+
 export async function findPipelineRunByExternalTaskId(
   externalTaskId: string,
 ): Promise<PipelineRunRow | null> {

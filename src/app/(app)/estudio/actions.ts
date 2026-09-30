@@ -10,7 +10,7 @@ import {
   updatePostStatus,
 } from "@/lib/db";
 import { adjustPostScript } from "@/lib/pipeline/generate";
-import { requestPostArt } from "@/lib/pipeline/media";
+import { requestPostArt, syncPostMedia } from "@/lib/pipeline/media";
 import { renderPostAssets } from "@/lib/pipeline/render";
 import { TEMPLATES } from "@/lib/render";
 import { getSlides } from "@/lib/render";
@@ -120,6 +120,14 @@ export async function generateArtAction(postId: string) {
   const post = await requireOwnedPost(postId);
   await requestPostArt(post.id);
   revalidatePath("/estudio");
+}
+
+/** Recupera arte já gerada no provedor cujo webhook não chegou. */
+export async function syncMediaAction(postId: string) {
+  const post = await requireOwnedPost(postId);
+  const r = await syncPostMedia(post.id);
+  revalidatePath("/estudio");
+  return r;
 }
 
 export async function renderAssetsAction(postId: string) {

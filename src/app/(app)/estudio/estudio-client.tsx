@@ -15,6 +15,7 @@ import {
   moveSlideAction,
   renderAssetsAction,
   setTemplateAction,
+  syncMediaAction,
   toggleSourceImageAction,
   updateContentAction,
   updateSlideAction,
@@ -245,7 +246,11 @@ export function EstudioClient({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => setRenderTick((t) => t + 1)}
+                  onClick={() => {
+                    setRenderTick((t) => t + 1);
+                    // Recupera arte gerada cujo webhook não chegou.
+                    if (selected) void syncMediaAction(selected.id).then(() => router.refresh());
+                  }}
                   className="h-7 gap-1.5 px-2 text-[12px] text-muted-foreground"
                   title="Recarregar a pré-visualização"
                 >

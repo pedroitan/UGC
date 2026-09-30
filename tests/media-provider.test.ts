@@ -57,6 +57,18 @@ describe("KieMediaProvider.createTask", () => {
     ).rejects.toThrow(/402|insufficient/);
   });
 
+  it("com imagem de referência troca pra image-to-image e manda input_urls", async () => {
+    mockCreateTaskResponse({ code: 200, data: { taskId: "t_i2i" } });
+    await provider.createTask({
+      kind: "image",
+      prompt: "restyle this",
+      referenceImageUrls: ["https://ex.com/foto.jpg", "http://insegura.com/x.png"],
+    });
+    const sent = JSON.parse((fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body);
+    expect(sent.model).toBe("gpt-image-2-image-to-image");
+    expect(sent.input.input_urls).toEqual(["https://ex.com/foto.jpg"]); // só https
+  });
+
   it("rejeita kinds sem modelo configurado", async () => {
     await expect(provider.createTask({ kind: "audio", prompt: "p" })).rejects.toThrow(
       /modelo/i,
@@ -120,6 +132,46 @@ describe("KieMediaProvider.parseWebhook", () => {
   it("payload malformado não quebra", () => {
     expect(provider.parseWebhook("lixo").status).toBe("failed");
     expect(provider.parseWebhook({ data: {} }).status).toBe("failed");
+  });
+});
+
+describe("KieMediaProvider.getTaskResult (sync via recordInfo)", () => {
+  it("traduz o recordInfo no mesmo resultado do webhook", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            code: 200,
+            data: {
+              taskId: "task_sync",
+              state: "success",
+              resultJson: '{"resultUrls":["https://cdn.aiquickdraw.com/art.png"]}',
+              creditsConsumed: 8,
+            },
+          }),
+          { status: 200 },
+        )),
+    );
+    const r = await provider.getTaskResult("task_sync");
+    expect(r.status).toBe("done");
+    expect(r.mediaUrls).toEqual(["https://cdn.aiquickdraw.com/art.png"]);
+    expect((fetch as ReturnType<typeof vi.fn>).mock.calls[0][0]).toContain(
+      "recordInfo?taskId=task_sync",
+    );
+  });
+
+  it("task ainda gerando volta pending", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({ code: 200, data: { taskId: "t", state: "generating" } }),
+          { status: 200 },
+        )),
+    );
+    const r = await provider.getTaskResult("t");
+    expect(r.pending).toBe(true);
   });
 });
 

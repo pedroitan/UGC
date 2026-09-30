@@ -62,6 +62,8 @@ export interface MediaTaskRequest {
   width?: number;
   height?: number;
   durationSeconds?: number;
+  /** URLs de imagem de referência (image-to-image). */
+  referenceImageUrls?: string[];
   /** URL de retorno para o webhook do provedor. */
   callbackUrl?: string;
 }

@@ -22,6 +22,9 @@ const DEFAULT_MODELS: Record<MediaKind, string | null> = {
   audio: null,
 };
 
+// Com imagens de referência troca pro variante image-to-image do mesmo modelo.
+const DEFAULT_I2I_MODEL = "gpt-image-2-image-to-image";
+
 // Razões de aspecto aceitas pelo createTask do kie.ai (market).
 const ASPECT_RATIOS = [
   "1:1", "3:2", "2:3", "4:3", "3:4", "5:4", "4:5", "16:9",
@@ -92,9 +95,22 @@ export class KieMediaProvider implements MediaProvider {
     return model;
   }
 
+  private imageToImageModel(): string {
+    const t2i = this.opts.imageModel ?? DEFAULT_MODELS.image!;
+    return t2i.includes("text-to-image")
+      ? t2i.replace("text-to-image", "image-to-image")
+      : DEFAULT_I2I_MODEL;
+  }
+
   async createTask(request: MediaTaskRequest): Promise<MediaTask> {
-    const model = this.modelFor(request.kind, request.model);
+    const refs = (request.referenceImageUrls ?? []).filter((u) => u.startsWith("https://"));
+    const model =
+      request.model ??
+      (request.kind === "image" && refs.length > 0
+        ? this.imageToImageModel()
+        : this.modelFor(request.kind));
     const input: Record<string, unknown> = { prompt: request.prompt };
+    if (refs.length > 0) input.input_urls = refs;
     if (request.width && request.height) {
       input.aspect_ratio = closestAspectRatio(request.width, request.height);
     }
@@ -158,6 +174,18 @@ export class KieMediaProvider implements MediaProvider {
     return mediaUrls.length > 0
       ? { ...base, status: "done", mediaUrls }
       : { ...base, status: "failed", mediaUrls, error: "sem mídia no resultado" };
+  }
+
+  /** Consulta o estado de uma task (recordInfo) — recupera runs cujo webhook falhou. */
+  async getTaskResult(taskId: string): Promise<KieWebhookParsed> {
+    const res = await fetch(
+      `${API_BASE}/api/v1/jobs/recordInfo?taskId=${encodeURIComponent(taskId)}`,
+      { headers: { Authorization: `Bearer ${this.apiKey}` } },
+    );
+    if (!res.ok) {
+      return { externalTaskId: taskId, status: "failed", mediaUrls: [], error: `HTTP ${res.status}` };
+    }
+    return this.parseWebhook(await res.json().catch(() => null));
   }
 
   /**
